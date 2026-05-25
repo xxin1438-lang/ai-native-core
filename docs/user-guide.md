@@ -36,6 +36,7 @@ ai-native init --stack react-spa
 | `vue` | Vue 3 + Vite + Pinia |
 | `backend-go` | Go 后端 |
 | `backend-python` | Python FastAPI |
+| `backend-java` | Java Spring Boot 3.x |
 
 ### 初始化生成了什么
 

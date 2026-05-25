@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const VALID_STACKS = ['react-spa', 'nextjs', 'vue', 'backend-go', 'backend-python'];
+const VALID_STACKS = ['react-spa', 'nextjs', 'vue', 'backend-go', 'backend-python', 'backend-java'];
 
 function run(args) {
   const idx = args.indexOf('--stack');
