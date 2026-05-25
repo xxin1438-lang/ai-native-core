@@ -27,7 +27,15 @@ cd your-project
 ai-native init --stack react-spa
 ```
 
-`--stack` 选择适配器：
+`--stack` 选择适配器，monorepo 支持逗号分隔多栈：
+
+```bash
+# 单栈
+ai-native init --stack react-spa
+
+# 多栈（monorepo 前后端）
+ai-native init --stack react-spa,backend-java
+```
 
 | 值 | 适用项目 |
 |----|---------|

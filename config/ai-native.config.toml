@@ -18,6 +18,8 @@ description = ""
 # =============================================================================
 [stack]
 # 适配器 ID，决定默认模板和规则
+# 单栈：adapter = "react-spa"
+# 多栈（monorepo）：adapter = ["react-spa", "backend-java"]
 # 可选值：react-spa | nextjs | vue | backend-go | backend-python | backend-java
 adapter = "react-spa"
 
@@ -129,6 +131,11 @@ manifest = ".ai-native/memory/MANIFEST.yaml"
 
 # 记忆文件输出目录
 output_dir = ".ai-native/memory/"
+
+# 自定义架构规则（覆盖适配器内置规则）
+# 如果此文件存在，蒸馏时优先使用；框架内置规则作为 fallback
+# 格式与 adapters/{stack}/immutable-rules.md 相同
+# custom_rules = ".ai-native/custom-rules.md"
 
 # LLM provider（用于蒸馏）：openai | anthropic | local
 # 如果不配置，使用 AI Agent 当前会话的模型

@@ -49,8 +49,25 @@ function run(args) {
     return;
   }
 
-  // Load adapter rules
-  const builtin = loadAdapterRules(config.stack?.adapter || 'react-spa');
+  // Load rules: custom > adapter builtin
+  const adapters = Array.isArray(config.stack?.adapter)
+    ? config.stack.adapter
+    : [config.stack?.adapter || 'react-spa'];
+
+  let builtin = mergeAdapterRules(adapters);
+
+  // Check for project-level custom rules (overrides adapter)
+  const customPath = config.distiller?.custom_rules;
+  if (customPath) {
+    const fullCustomPath = path.join(root, customPath);
+    if (fs.existsSync(fullCustomPath)) {
+      const customRules = loadAdapterRules(fullCustomPath);
+      if (Object.keys(customRules).length > 0) {
+        console.log(`[ai-native] Using custom rules: ${customPath}`);
+        builtin = customRules; // Override entirely
+      }
+    }
+  }
 
   // Process
   const factors = targetFactor ? manifest.factors.filter(f => f.name === targetFactor) : manifest.factors;
@@ -114,6 +131,19 @@ metadata:
 # ${title}
 ${builtinContent || '\n- (蒸馏引擎将在完整实现中从源文件提取因子)\n'}
 `;
+}
+
+function mergeAdapterRules(adapters) {
+  const merged = {};
+  for (const name of adapters) {
+    const rules = loadAdapterRules(name);
+    for (const [key, content] of Object.entries(rules)) {
+      if (content) {
+        merged[key] = (merged[key] || '') + '\n' + content;
+      }
+    }
+  }
+  return merged;
 }
 
 module.exports = { run };
