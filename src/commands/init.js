@@ -25,7 +25,8 @@ function run(args) {
         process.exit(1);
       }
     }
-    doInit(stacks, isForce);
+    const answers = inferFromStacks(stacks);
+    doInit(stacks, isForce, answers);
   } else {
     interactiveInit(isForce);
   }
@@ -126,6 +127,35 @@ function doInit(stacks, isForce, answers = {}) {
   console.log('  1. ai-native sync');
   console.log('  2. ai-native hooks install');
   console.log('  3. ai-native accept');
+}
+
+function inferFromStacks(stacks) {
+  const answers = { pm: 'pnpm' };
+  const frontendStacks = ['react-spa', 'nextjs', 'vue'];
+  const backendStacks = ['backend-java', 'backend-go', 'backend-python'];
+  const hasFrontend = stacks.some(s => frontendStacks.includes(s));
+  const hasBackend = stacks.some(s => backendStacks.includes(s));
+
+  if (hasFrontend && hasBackend) answers.type = 'fullstack';
+  else if (hasBackend) answers.type = 'backend';
+  else answers.type = 'frontend';
+
+  if (hasBackend) {
+    const lang = stacks.find(s => s.startsWith('backend-')).replace('backend-', '');
+    answers.test = { java: 'junit', go: 'go-test', python: 'pytest' }[lang] || 'junit';
+  } else {
+    answers.test = 'vitest';
+  }
+
+  if (hasFrontend) {
+    answers.css = 'tailwind-v4';
+    answers.ui = 'shadcn';
+    answers.ts = 'yes';
+  } else {
+    answers.ts = 'no';
+  }
+
+  return answers;
 }
 
 module.exports = { run };
