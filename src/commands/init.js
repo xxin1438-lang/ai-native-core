@@ -97,6 +97,8 @@ function doInit(stacks, isForce, answers = {}) {
   };
 
   copyFile('config/ai-native.config.toml', '.ai-native/config.toml', c => {
+    c = c.replace(/type = "frontend"/, `type = "${answers.type || 'frontend'}"`);
+    if (answers.type) c = c.replace(/name = "my-project"/, `name = "${path.basename(root)}"`);
     c = c.replace(/adapter = "react-spa"/, stacks.length > 1
       ? `adapter = [${stacks.map(s => `"${s}"`).join(', ')}]`
       : `adapter = "${stacks[0]}"`);
@@ -104,7 +106,7 @@ function doInit(stacks, isForce, answers = {}) {
     if (answers.css) c = c.replace(/css = "tailwind-v4"/, `css = "${answers.css}"`);
     if (answers.ui) c = c.replace(/ui_library = "shadcn"/, `ui_library = "${answers.ui}"`);
     if (answers.test) c = c.replace(/test_framework = "vitest"/, `test_framework = "${answers.test}"`);
-    if (answers.ts) c = c.replace(/typescript = true/, `typescript = ${answers.ts === 'yes'}`);
+    if (answers.ts !== undefined) c = c.replace(/typescript = true/, `typescript = ${answers.ts === 'yes'}`);
     return c;
   });
 
