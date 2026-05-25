@@ -223,7 +223,36 @@ docs/self-update.md       # 变更日志，git 提交
 
 ---
 
-## 九、常见问题
+## 九、框架升级
+
+当 ai-native-core 发布新版本时（新增适配器、更新内置规则、修 bug）：
+
+```bash
+# 1. 更新全局包
+npm update -g ai-native-core
+
+# 2. 在项目目录中重新蒸馏（--force 确保新规则被纳入）
+cd your-project
+ai-native sync --force
+
+# 3. 检查是否需要更新
+ai-native sync --check
+```
+
+### 升级影响
+
+| 升级内容 | 对项目的影响 | 需要做什么 |
+|---------|------------|-----------|
+| 新增适配器（如 backend-java） | 无（新项目初始化时才用） | 无需操作 |
+| 适配器内置规则更新 | 下次 sync 自动纳入 | `ai-native sync --force` |
+| CLI 新增命令 | 直接可用 | 无需操作 |
+| config.toml 新增字段 | 已有项目用默认值 | 按需添加 |
+
+CI 环境建议锁定版本：`npm install -g ai-native-core@0.1.0`
+
+---
+
+## 十、常见问题
 
 **Q: sync 后 AI 还是不知道约束？**
 
