@@ -6,6 +6,11 @@ const commands = ['init', 'sync', 'accept', 'hooks'];
 const args = process.argv.slice(2);
 const command = args[0];
 
+if (command === '--version' || command === '-v') {
+  console.log(require('../package.json').version);
+  process.exit(0);
+}
+
 if (!command || command === '--help' || command === '-h') {
   console.log(`
 ai-native — AI Native Core CLI

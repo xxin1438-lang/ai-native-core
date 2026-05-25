@@ -147,6 +147,7 @@ ai-native sync
 | `ai-native accept` | 运行验收管道 |
 | `ai-native hooks install` | 安装 hooks |
 | `ai-native hooks status` | 查看 hooks 状态 |
+| `ai-native --version` | 查看版本号 |
 
 ---
 
