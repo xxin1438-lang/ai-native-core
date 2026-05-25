@@ -106,8 +106,13 @@ paradigm_detection = true
 # SDD 门禁（Spec-Driven Development）
 # =============================================================================
 [sdd]
+# 完整流程：explore（可选）→ propose → confirm → apply
 # 是否强制 spec-before-code
 enforced = true
+
+# 复杂需求是否推荐先 explore（探索需求、澄清边界）
+# 设为 true 时，AI 会在 propose 前主动建议 explore
+recommend_explore = true
 
 # 是否要求 design.md 包含 ASCII wireframe
 require_ascii_wireframe = true

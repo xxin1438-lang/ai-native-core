@@ -33,8 +33,10 @@
 
 ## SDD 流程（不可变）
 
+- 完整流程：explore（复杂需求推荐）→ propose → confirm → apply
 - 禁止跳过 spec 阶段直接写实现代码
 - 禁止 design.md 缺少 ASCII 页面骨架图
+- 复杂需求（新模块、架构变更）应先 explore 再 propose，禁止跳过 explore 直接 propose
 
 ## 技术栈一致性（不可变）
 

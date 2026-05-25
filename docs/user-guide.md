@@ -20,21 +20,23 @@ ai-native --version
 
 ## 二、初始化新项目
 
-在项目根目录执行：
+两种方式：
 
 ```bash
+# 方式 1：交互式问答（推荐）
 cd your-project
-ai-native init --stack react-spa
+ai-native init
+# → 选择项目类型 → 前端框架 → 后端语言 → 包管理器 → 确认
+
+# 方式 2：命令行参数
+ai-native init --stack react-spa,backend-java
 ```
 
-`--stack` 选择适配器，monorepo 支持逗号分隔多栈：
+`--stack` 支持逗号分隔多栈：
 
 ```bash
-# 单栈
-ai-native init --stack react-spa
-
-# 多栈（monorepo 前后端）
-ai-native init --stack react-spa,backend-java
+ai-native init --stack react-spa             # 单栈
+ai-native init --stack react-spa,backend-java # 多栈 monorepo
 ```
 
 | 值 | 适用项目 |
@@ -191,7 +193,63 @@ docs/decisions/2026-05-25-01-topic.md
 
 ---
 
-## 七、验收流程
+## 七、自定义架构规则
+
+框架内置规则不适合团队？创建项目级覆盖：
+
+```bash
+# 复制内置规则作为起点
+cp $(npm root -g)/ai-native-core/adapters/backend-java/immutable-rules.md \
+   .ai-native/custom-rules.md
+
+# 编辑成团队的规则
+vim .ai-native/custom-rules.md
+```
+
+在 config.toml 中激活：
+
+```toml
+[distiller]
+custom_rules = ".ai-native/custom-rules.md"
+```
+
+```bash
+ai-native sync --force
+# → [ai-native] Using custom rules: .ai-native/custom-rules.md
+```
+
+> `custom-rules.md` 存在则完全替代框架内置规则；不存在则退回内置规则。
+
+## 八、SDD 工作流（OpenSpec）
+
+```bash
+# config.toml 中启用
+[sdd]
+enforced = true
+recommend_explore = true   # 复杂需求先 explore
+
+[ai_tools]
+sdd_tool = "openspec"
+```
+
+日常流程：
+
+```
+简单 bug fix:
+  /opsx:propose → 确认 → /opsx:apply
+
+复杂新功能:
+  /opsx:explore → 澄清需求边界
+  /opsx:propose → 生成 spec
+  人工确认
+  /opsx:apply   → 实施
+```
+
+验收时自动检查 spec 目录：`ai-native accept`
+
+---
+
+## 九、验收流程
 
 ```bash
 ai-native accept
@@ -210,7 +268,7 @@ CI 环境用 `ai-native accept --ci`，跳过交互和视觉走查。
 
 ---
 
-## 八、目录与 .gitignore
+## 十、目录与 .gitignore
 
 ```
 .ai-native/memory/        # 本机生成，不提交
@@ -231,7 +289,7 @@ docs/self-update.md       # 变更日志，git 提交
 
 ---
 
-## 九、框架升级
+## 十一、框架升级
 
 当 ai-native-core 发布新版本时（新增适配器、更新内置规则、修 bug）：
 
@@ -260,7 +318,7 @@ CI 环境建议锁定版本：`npm install -g ai-native-core@0.1.0`
 
 ---
 
-## 十、常见问题
+## 十二、常见问题
 
 **Q: sync 后 AI 还是不知道约束？**
 

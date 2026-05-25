@@ -137,13 +137,21 @@ factors:
 
 ### Layer 3 — SDD 门禁层
 
-不可跳步的 spec-before-code 管道：
+完整的 spec-before-code 管道：
 
 ```
-propose → design.md (含 ASCII wireframe) → 人工确认 → apply
+explore（可选）→ propose → design.md (ASCII wireframe) → 人工确认 → apply
 ```
+
+| 阶段 | 必选 | 说明 |
+|------|------|------|
+| explore | 推荐 | 复杂需求先探索边界、澄清歧义（OpenSpec: `/opsx:explore`） |
+| propose | **必选** | 生成 proposal.md / design.md / tasks.md |
+| confirm | **必选** | 人工确认 spec，不可跳过 |
+| apply | **必选** | 基于确认后的 spec 实施代码 |
 
 这一层与具体 SDD 工具解耦。框架预留接口：
+- `sdDClient.explore(context)` → 探索需求边界
 - `sdDClient.propose(context)` → 生成 proposal/design/tasks
 - `sdDClient.apply(change)` → 执行实现
 - `sdDClient.validate(design)` → 校验 wireframe 存在

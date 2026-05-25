@@ -32,6 +32,21 @@ function run(args) {
     return { pass: fs.existsSync(p), detail: fs.existsSync(p) ? 'initialized' : 'NOT INITIALIZED' };
   }, results);
 
+  // Phase 1.5 — SDD check
+  const sddTool = config.sdd?.tool || config.ai_tools?.sdd_tool;
+  if (sddTool && sddTool !== 'none') {
+    console.log('Phase 1.5 — SDD 门禁');
+    check('sdd-tool-configured', () => {
+      const dir = path.join(root, 'openspec', 'changes');
+      const ok = fs.existsSync(dir) && fs.readdirSync(dir).length > 0;
+      return { pass: ok || sddTool !== 'openspec', detail: sddTool + (ok ? ' ✓' : ' (spec 目录为空)') };
+    }, results);
+    check('sdd-gate', () => {
+      const enforced = config.sdd?.enforced !== false;
+      return { pass: enforced, detail: enforced ? 'enforced' : '⚠ disabled' };
+    }, results);
+  }
+
   // Phase 2
   console.log('Phase 2 — 代码质量');
   check('lint', () => tryExec('pnpm lint || npm run lint || true', root), results);
