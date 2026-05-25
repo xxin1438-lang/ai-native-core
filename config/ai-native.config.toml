@@ -18,7 +18,7 @@ description = ""
 # =============================================================================
 [stack]
 # 适配器 ID，决定默认模板和规则
-# 可选值：react-spa | nextjs | vue | svelte | backend-go | backend-python
+# 可选值：react-spa | nextjs | vue | backend-go | backend-python | backend-java
 adapter = "react-spa"
 
 # 包管理器：pnpm | npm | yarn | bun
@@ -30,7 +30,7 @@ css = "tailwind-v4"
 # UI 组件库（前端项目）：shadcn | radix | mui | antd | none
 ui_library = "shadcn"
 
-# 测试框架：vitest | jest | playwright | go-test | pytest
+# 测试框架：vitest | jest | playwright | go-test | pytest | junit
 test_framework = "vitest"
 
 # TypeScript（前端/Node 项目）

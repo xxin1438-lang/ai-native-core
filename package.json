@@ -11,10 +11,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/xxin1438-lang/ai-native-core.git"
+    "url": "git+https://github.com/xxin1438-lang/ai-native-core.git"
   },
   "bin": {
-    "ai-native": "./bin/ai-native.js"
+    "ai-native": "bin/ai-native.js"
   },
   "files": [
     "bin/",
