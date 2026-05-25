@@ -3,6 +3,12 @@
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
+const { execSync } = require('child_process');
+
+function getProjectRoot() {
+  try { return execSync('git rev-parse --show-toplevel', { encoding: 'utf-8' }).trim(); }
+  catch { return process.cwd(); }
+}
 
 const VALID_STACKS = ['react-spa', 'nextjs', 'vue', 'backend-go', 'backend-python', 'backend-java'];
 
@@ -76,7 +82,7 @@ function interactiveInit(isForce) {
 }
 
 function doInit(stacks, isForce, answers = {}) {
-  const root = process.cwd();
+  const root = getProjectRoot();
   const dirs = ['.ai-native/memory', '.ai-native/hooks', '.ai-native/reports', 'docs/.ai-native/memory', 'docs/decisions'];
 
   console.log(`\n[ai-native] Initializing...\n`);
