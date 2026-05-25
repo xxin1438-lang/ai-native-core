@@ -1,0 +1,8 @@
+node_modules/
+.ai-native/memory/
+.ai-native/reports/
+.ai-native/hooks/
+!.ai-native/config.toml
+!.ai-native/acceptance.yaml
+!.ai-native/memory/MANIFEST.yaml
+.DS_Store

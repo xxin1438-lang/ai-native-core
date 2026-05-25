@@ -1,0 +1,178 @@
+# =============================================================================
+# AI Native Core — 记忆因子清单
+# =============================================================================
+# 声明式定义每个记忆因子：从哪里来、蒸馏规则、质量标准
+# 执行 `ai-native sync` 时读取此文件
+# =============================================================================
+
+version: 1
+
+# 默认蒸馏 prompt（所有因子共用，各因子可覆盖）
+default_distill_prompt: |
+  你是项目知识蒸馏器。从以下源文件中提取高信号约束。
+  要求：
+  - 每条一行，独立可操作，读一遍能做出正确决策
+  - 不是文件摘要，是直接影响行为的约束
+  - 禁止复制源文件原文，只输出蒸馏后的因子
+
+# =============================================================================
+# 因子定义
+# =============================================================================
+factors:
+  - name: design-foundation
+    description: UI 开发行为约束：组件优先级、token 用法、布局规则
+    source_globs:
+      - "design/**/*.md"
+      - "design/**/*.css"
+      - "docs/design-system/**/*.md"
+    distill_prompt: |
+      提取设计约束：用什么组件库、token 怎么用、布局规则、禁止的写法。
+      聚焦"怎么做"而非"有什么"。
+    max_items: 15
+    priority: critical
+    output_file: "design-foundation.md"
+
+  - name: forbidden-patterns
+    description: 明确禁止的行为红线
+    source_globs:
+      - "docs/architecture/**/*.md"
+      - "docs/standards/**/*.md"
+      - ".github/workflows/*.yml"
+    builtin_sources:
+      - "adapters/{stack}/immutable-rules.md"  # 适配器内置架构不变性规则，始终纳入蒸馏
+    distill_prompt: |
+      提取所有"禁止"、"不允许"、"不要"开头的规则。
+      适配器内置规则（builtin_sources）具有最高优先级，必须全部保留。
+      项目文档中的规则作为补充。每条以"禁止"开头。标注来源。
+    max_items: 25
+    priority: critical
+    output_file: "forbidden-patterns.md"
+
+  - name: known-pitfalls
+    description: 实战中踩过的坑
+    source_globs:
+      - "docs/decisions/**/*.md"
+      - "docs/postmortems/**/*.md"
+    distill_prompt: |
+      提取踩坑记录。格式：`问题描述 → 根因 → 正确做法`。
+      每条一行。去重。
+    max_items: 15
+    priority: high
+    output_file: "known-pitfalls.md"
+
+  - name: available-resources
+    description: 现成可用资源索引
+    source_globs:
+      - "src/components/"
+      - "src/hooks/"
+      - "src/utils/"
+      - "templates/"
+    distill_prompt: |
+      列出可复用的组件、hooks、工具函数、模板。
+      格式：`名称 — 路径 — 一句话用途`。
+    max_items: 20
+    priority: high
+    output_file: "available-resources.md"
+
+  - name: architecture-paradigm
+    description: 架构决策和工作范式
+    source_globs:
+      - "docs/architecture/**/*.md"
+      - "docs/adr/**/*.md"
+      - "README.md"
+    distill_prompt: |
+      提取架构决策、分层规则、数据流约束、状态管理策略。
+      每条一个决策点。
+    max_items: 15
+    priority: critical
+    output_file: "architecture-paradigm.md"
+
+# =============================================================================
+# 蒸馏质量规则
+# =============================================================================
+quality:
+  max_item_length: 200
+  max_file_lines: 50
+  max_common_substring_with_source: 80
+  forbidden_in_output:
+    - "本文档"
+    - "以下"
+    - "详见"
+    - "参考"
+
+# =============================================================================
+# SYNC-STATE 配置 + per-factor 增量 hash
+# =============================================================================
+sync_state:
+  file: "SYNC-STATE.md"
+  fields:
+    - synced_at
+    - git_hash
+    - monitored_paths
+    - files_read
+    - factors_synced
+    - factor_hashes
+
+# =============================================================================
+# 记忆文件输出格式
+# =============================================================================
+# 详见 docs/design/memory-factor-spec.md
+output_format:
+  frontmatter:
+    required:
+      - name
+      - description
+      - metadata.type
+      - metadata.synced-from
+      - metadata.synced-at
+      - metadata.source-files
+  content:
+    item_prefix: "- "
+    item_separator: "\n"
+
+# =============================================================================
+# Template sync
+# =============================================================================
+template_sync:
+  enabled: true
+  dir: "docs/.ai-native/memory/"
+  files:
+    - "design-foundation.md"
+    - "forbidden-patterns.md"
+    - "known-pitfalls.md"
+    - "available-resources.md"
+    - "architecture-paradigm.md"
+    - "SYNC-STATE.md"
+
+# =============================================================================
+# AI 工具配置生成模板
+# =============================================================================
+ai_config_generation:
+  claude:
+    file: ".claude/CLAUDE.md"
+    template: |
+      # Project Context
+
+      ## 资产记忆因子
+
+      以下文件由 `ai-native sync` 生成，首次使用或范式变更后需重新同步。
+
+      {memory_references}
+
+  cursor:
+    file: ".cursor/rules/ai-native.md"
+    template: |
+      # AI Native Memory Factors
+
+      Always apply these constraints when generating code:
+
+      {memory_references}
+
+  copilot:
+    file: ".github/copilot-instructions.md"
+    template: |
+      ## Project Constraints
+
+      Read before generating code:
+
+      {memory_references}

@@ -1,0 +1,145 @@
+# =============================================================================
+# AI Native Core — 项目级配置
+# =============================================================================
+# 本文件是框架的单一配置入口。
+# 执行 `ai-native init` 时自动生成，可按需编辑。
+# =============================================================================
+
+[project]
+# 项目名称（用于报告和提示文案）
+name = "my-project"
+# 项目类型：frontend | backend | fullstack | cli | library
+type = "frontend"
+# 项目描述（可选，用于 AI context）
+description = ""
+
+# =============================================================================
+# 技术栈
+# =============================================================================
+[stack]
+# 适配器 ID，决定默认模板和规则
+# 可选值：react-spa | nextjs | vue | svelte | backend-go | backend-python
+adapter = "react-spa"
+
+# 包管理器：pnpm | npm | yarn | bun
+package_manager = "pnpm"
+
+# CSS 方案（前端项目）：tailwind-v4 | tailwind-v3 | css-modules | styled-components | none
+css = "tailwind-v4"
+
+# UI 组件库（前端项目）：shadcn | radix | mui | antd | none
+ui_library = "shadcn"
+
+# 测试框架：vitest | jest | playwright | go-test | pytest
+test_framework = "vitest"
+
+# TypeScript（前端/Node 项目）
+typescript = true
+
+# =============================================================================
+# 源文件路径（蒸馏源）
+# =============================================================================
+[paths]
+# 文档目录（架构决策、设计系统、编码规范等）
+docs = "docs/"
+
+# 设计资产目录（tokens、组件截图等）
+design = "design/"
+
+# 源码目录
+source = "src/"
+
+# 功能模块目录
+features = "src/features/"
+
+# CI/CD 配置目录
+ci = ".github/workflows/"
+
+# =============================================================================
+# AI 工具链
+# =============================================================================
+[ai_tools]
+# 目标 AI 工具：同时生成多套配置
+# 可选值：claude | cursor | copilot | all
+engines = ["claude", "cursor"]
+
+# SDD 工具：openspec | linear | none
+sdd_tool = "openspec"
+
+# E2E 视觉验证工具：chrome-mcp | playwright-mcp | none
+visual_e2e_tool = "chrome-mcp"
+
+# =============================================================================
+# 范式路径（监控哪些路径变更时触发 sync）
+# =============================================================================
+[paradigm]
+# 当 commit 涉及这些路径时，提示运行 ai-native sync
+watch_paths = [
+  "docs/architecture/",
+  "docs/design-system/",
+  "design/",
+  ".github/workflows/",
+]
+
+# 踩坑记录目录
+studybook_path = "docs/decisions/"
+
+# 范式变更日志文件
+self_update_path = "CHANGELOG.md"
+
+# =============================================================================
+# Hooks 配置（自迭代引擎）
+# =============================================================================
+[hooks]
+# 是否启用
+enabled = true
+
+# 复盘提醒冷却时间（秒），默认 1200（20 分钟）
+reminder_cooldown_sec = 1200
+
+# 是否启用范式变更检测
+paradigm_detection = true
+
+# =============================================================================
+# SDD 门禁（Spec-Driven Development）
+# =============================================================================
+[sdd]
+# 是否强制 spec-before-code
+enforced = true
+
+# 是否要求 design.md 包含 ASCII wireframe
+require_ascii_wireframe = true
+
+# =============================================================================
+# Onboarding（新成员引导流程）
+# =============================================================================
+[onboarding]
+# 是否启用 Demo Golden Path（无 Demo 项目可关闭）
+demo_enabled = false
+
+# 如果是 true，Demo 类型：user-profile | custom
+# demo_type = "user-profile"
+
+# =============================================================================
+# 记忆因子蒸馏
+# =============================================================================
+[distiller]
+# 记忆因子清单文件路径
+manifest = ".ai-native/memory/MANIFEST.yaml"
+
+# 记忆文件输出目录
+output_dir = ".ai-native/memory/"
+
+# LLM provider（用于蒸馏）：openai | anthropic | local
+# 如果不配置，使用 AI Agent 当前会话的模型
+# llm_provider = "anthropic"
+
+# =============================================================================
+# 验收
+# =============================================================================
+[acceptance]
+# 验收配置路径
+config = ".ai-native/acceptance.yaml"
+
+# 报告输出目录
+report_dir = ".ai-native/reports/"
