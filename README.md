@@ -60,4 +60,4 @@ ai-native accept           # 验收
 
 **文档**：[使用指南](./docs/user-guide.md) · [架构](./docs/design/architecture.md) · [Skill](./docs/design/skills-catalog.md)
 
-**版本** `v0.3.8`
+
