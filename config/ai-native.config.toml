@@ -62,7 +62,7 @@ ci = ".github/workflows/"
 # =============================================================================
 [ai_tools]
 # 目标 AI 工具：同时生成多套配置
-# 可选值：claude | cursor | copilot | all
+# 可选值：claude | cursor | copilot | deepseek | codex | all
 engines = ["claude", "cursor"]
 
 # SDD 工具：openspec | linear | none

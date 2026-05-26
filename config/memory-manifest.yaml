@@ -176,3 +176,21 @@ ai_config_generation:
       Read before generating code:
 
       {memory_references}
+
+  deepseek:
+    file: ".deepseek/rules/ai-native.md"
+    template: |
+      # AI Native Memory Factors
+
+      Always apply these constraints when generating code:
+
+      {memory_references}
+
+  codex:
+    file: ".codex/rules/ai-native.md"
+    template: |
+      # AI Native Memory Factors
+
+      Always apply these constraints when generating code:
+
+      {memory_references}

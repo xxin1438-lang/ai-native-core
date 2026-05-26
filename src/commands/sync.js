@@ -111,6 +111,9 @@ metadata:
   }
   fs.copyFileSync(syncStatePath, path.join(tmplDir, 'SYNC-STATE.md'));
 
+  // Generate AI tool configs
+  generateAIConfigs(root, config, manifest);
+
   console.log(`[ai-native] Done. hash: ${currentHash.substring(0, 8)}`);
   showFactorSummary(memoryDir, lang);
 }
@@ -145,6 +148,31 @@ function mergeAdapterRules(adapters) {
     }
   }
   return merged;
+}
+
+function generateAIConfigs(root, config, manifest) {
+  const memoryRefs = manifest.factors
+    .map(f => `@memory/${f.output_file}`)
+    .join('\n');
+
+  const engines = config.ai_tools?.engines || ['claude'];
+
+  const templates = {
+    claude: { file: '.claude/CLAUDE.md', content: `# Project Context\n\n## 资产记忆因子\n\n以下文件由 \`ai-native sync\` 生成。\n\n${memoryRefs}\n` },
+    cursor: { file: '.cursor/rules/ai-native.md', content: `# AI Native Memory Factors\n\nAlways apply these constraints:\n\n${memoryRefs}\n` },
+    copilot: { file: '.github/copilot-instructions.md', content: `## Project Constraints\n\nRead before generating code:\n\n${memoryRefs}\n` },
+    deepseek: { file: '.deepseek/rules/ai-native.md', content: `# AI Native Memory Factors\n\nAlways apply these constraints when generating code:\n\n${memoryRefs}\n` },
+    codex: { file: '.codex/rules/ai-native.md', content: `# AI Native Memory Factors\n\nAlways apply these constraints:\n\n${memoryRefs}\n` },
+  };
+
+  const allEngines = engines.includes('all') ? Object.keys(templates) : engines;
+  for (const engine of allEngines) {
+    const t = templates[engine];
+    if (!t) continue;
+    const dir = path.dirname(path.join(root, t.file));
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(root, t.file), t.content);
+  }
 }
 
 function showFactorSummary(memoryDir, lang) {

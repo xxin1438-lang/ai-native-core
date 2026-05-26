@@ -188,8 +188,25 @@ Read before generating code:
 - .ai-native/memory/architecture-paradigm.md
 ```
 
+**DeepSeek TUI**（`.deepseek/rules/ai-native.md`）：
+```markdown
+# AI Native Memory Factors
+
+Always apply these constraints when generating code:
+
+@memory/design-foundation.md
+@memory/forbidden-patterns.md
+@memory/known-pitfalls.md
+@memory/available-resources.md
+@memory/architecture-paradigm.md
+```
+
+**OpenAI Codex**（`.codex/rules/ai-native.md`）：格式同 DeepSeek TUI。
+
 ### 生成规则
 
 - 文件已存在：检查 @ 引用是否 ≥ 因子数，缺失则补充
 - 文件不存在：按模板创建
+- 支持 5 种引擎：claude / cursor / copilot / deepseek / codex
+- `engines = ["all"]` 一次生成全部
 - `ai-native sync --check` 可只校验不写入
