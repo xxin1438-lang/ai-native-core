@@ -1,6 +1,6 @@
 {
   "name": "ai-native-core",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "让任何项目拥有 AI Native 开发能力的运行时框架",
   "keywords": [
     "ai-native",
