@@ -1,0 +1,13 @@
+# backend-python acceptance overrides
+
+phase_overrides:
+  code-quality:
+    lint:
+      run: "ruff check ."
+    typecheck:
+      run: "mypy src/"
+    test:
+      run: "pytest"
+  build:
+    build:
+      run: "python -m build"

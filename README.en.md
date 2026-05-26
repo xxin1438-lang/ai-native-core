@@ -17,6 +17,16 @@ A config-driven, adapter-pattern, stack-agnostic AI-native development framework
 - **Acceptance Automation**: YAML config → auto-execute → structured report
 - **Multi-role**: PM / Frontend / Backend / QA, each has an entry point
 
+### Core Value
+
+**AI auto-complies with your project rules. No need to repeat yourself every session.**
+
+| Scenario | Effect |
+|----------|--------|
+| Daily dev | AI loads memory factors — "No direct DB access from Controller" → AI won't do it |
+| Rule change | Update docs → `ai-native sync` → AI complies next session |
+| Acceptance | `ai-native accept` runs lint/typecheck/test/e2e/build in one command |
+
 ## Quick Start
 
 ```bash

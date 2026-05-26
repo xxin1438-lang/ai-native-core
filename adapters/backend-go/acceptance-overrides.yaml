@@ -1,0 +1,13 @@
+# backend-go acceptance overrides
+
+phase_overrides:
+  code-quality:
+    lint:
+      run: "golangci-lint run"
+    typecheck:
+      run: "go vet ./..."
+    test:
+      run: "go test ./..."
+  build:
+    build:
+      run: "go build ./..."

@@ -1,67 +1,63 @@
 # AI Native Core
 
-**让任何项目拥有 AI Native 开发能力——不是另一个模板仓库，而是一个可安装的运行时框架。**
+**让 AI 自动遵守项目规范。不是模板仓库，是可安装的运行时框架。**
 
 [中文](./README.md) | [English](./README.en.md)
 
 ---
 
-## 这是什么
+## 是什么
 
-配置驱动、适配器模式、跨技术栈的 AI Native 开发框架。核心能力：
+配置驱动、适配器模式、跨技术栈的 AI Native 开发框架。
 
-- **资产记忆引擎**：项目文档 → LLM 蒸馏 → 紧凑约束因子 → AI 每次会话自动加载
+- **资产记忆引擎**：项目文档 → LLM 蒸馏 → 记忆因子 → AI 每次会话自动加载
 - **SDD 门禁**：explore → propose → confirm → apply，不可跳步
-- **双轨验证**：代码行为（Playwright）+ 视觉渲染（chrome MCP）
-- **自迭代 hooks**：自动检测范式变更、提醒踩坑复盘、驱动记忆更新
-- **验收自动化**：YAML 配置 → 自动执行 → 结构化报告
-- **多角色支持**：产品 / 前端 / 后端 / 测试，各有入口
+- **双轨验证**：代码行为 + 视觉渲染
+- **自迭代 hooks**：范式变更检测 + 踩坑复盘
+- **验收自动化**：YAML 配置 → 一键执行 → 结构化报告
+- **多角色**：产品 / 前端 / 后端 / 测试
 
-## 快速开始
+## 为什么
+
+**AI 不知道你的项目规范，每次都要重复解释。**
+
+| 没有 ai-native | 有 ai-native |
+|---------------|-------------|
+| AI 把业务逻辑写在 Controller 里 | AI 自动看到"禁止 Controller 直连数据库"，不会那么写 |
+| CR 反复指出同样的问题 | forbidden-patterns 一次蒸馏，永久生效 |
+| 新人读 20 份文档才敢写代码 | `init && sync`，AI 带着规范写 |
+| 规范改了口口相传 | 改文档 → `sync` → 全员 AI 自动更新 |
+| 验收手动跑 6 个命令 | `ai-native accept` 一条命令 |
+
+**三个场景**：
+
+| 场景 | 你做什么 | 效果 |
+|------|---------|------|
+| 日常开发 | 什么都不做 | AI 自动加载记忆因子 |
+| 规范变更 | 改架构文档 → `ai-native sync` | AI 下个会话自动遵守 |
+| 提交前 | `ai-native accept` | 一键跑完检查 |
+
+## 怎么用
 
 ```bash
 npm install -g ai-native-core
 cd your-project
-ai-native init                  # 交互式问答，或 --stack react-spa
-ai-native sync && ai-native hooks install && ai-native accept
+ai-native                  # 一键启动
+ai-native hooks install    # hooks
+ai-native accept           # 验收
 ```
 
-## 支持的技术栈
+**技术栈**：`react-spa` `nextjs` `vue` `backend-java` `backend-go` `backend-python`
 
-| 类型 | 适配器 |
-|------|--------|
-| 前端 | `react-spa` `nextjs` `vue` |
-| 后端 | `backend-java` `backend-go` `backend-python` |
-| 多栈 | 逗号分隔：`react-spa,backend-java` |
+**角色入口**：[各角色手册](./docs/role-quickstart.md)
 
-## 团队角色
+| 角色 | 第一句话 |
+|------|---------|
+| PM | `review PRD` |
+| 前端 | `/ai-native init` |
+| 后端 | `/ai-native init` |
+| 测试 | `/ai-native accept` |
 
-| 角色 | 需要做什么 | 推荐 Skill |
-|------|-----------|-----------|
-| 产品经理 | 写 PRD → review 骨架图 | PRD Review |
-| 前端开发 | init → sync → propose → apply → accept | OpenSpec + chrome-mcp |
-| 后端开发 | 同上 | OpenSpec + API 契约生成 |
-| 测试/QA | accept → E2E 双轨 → 报告 | chrome-mcp |
+**文档**：[使用指南](./docs/user-guide.md) · [架构](./docs/design/architecture.md) · [Skill](./docs/design/skills-catalog.md)
 
-## 文档
-
-| 文档 | 说明 |
-|------|------|
-| [使用指南](./docs/user-guide.md) | 按角色组织的完整使用手册 |
-| [架构设计](./docs/design/architecture.md) | 五层架构详解 |
-| [Skill 目录](./docs/design/skills-catalog.md) | 各角色推荐 Skill |
-| [产品协作](./docs/design/product-collaboration.md) | PM 如何参与 |
-| [基座保护](./docs/design/base-integrity.md) | 框架完整性保障 |
-| [项目自检测](./docs/design/project-detection.md) | 自动检测语言版本 |
-
-## 设计原则
-
-1. **配置 > 代码** — 项目差异通过配置表达
-2. **适配器隔离** — 技术栈差异封装在适配器中
-3. **渐进式采用** — 可只用记忆蒸馏，再逐步接入 SDD
-4. **LLM 无关** — 不绑定特定 AI 模型
-5. **可见即可审计** — 所有生成物是人类可读文本
-
-## 版本
-
-`v0.2.x` — CLI 可用（init / sync / accept / hooks），蒸馏引擎为骨架实现。
+**版本** `v0.3.6`

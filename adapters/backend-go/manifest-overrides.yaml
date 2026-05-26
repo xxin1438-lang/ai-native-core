@@ -1,0 +1,22 @@
+# backend-go manifest overrides
+
+factors:
+  design-foundation:
+    source_globs:
+      - "docs/architecture/**/*.md"
+  forbidden-patterns:
+    source_globs:
+      - "docs/architecture/**/*.md"
+      - "docs/standards/**/*.md"
+  known-pitfalls:
+    source_globs:
+      - "docs/decisions/**/*.md"
+  available-resources:
+    source_globs:
+      - "internal/"
+      - "pkg/"
+      - "cmd/"
+  architecture-paradigm:
+    source_globs:
+      - "docs/architecture/**/*.md"
+      - "README.md"

@@ -1,0 +1,17 @@
+# backend-java acceptance overrides
+
+# 这些命令会替换 acceptance.yaml 模板中的默认命令
+phase_overrides:
+  code-quality:
+    lint:
+      run: "mvn checkstyle:check"
+    typecheck:
+      run: "mvn compile"
+    test:
+      run: "mvn test"
+  e2e:
+    e2e-code:
+      run: "mvn verify"
+  build:
+    build:
+      run: "mvn package -DskipTests"

@@ -1,0 +1,20 @@
+# backend-python manifest overrides
+
+factors:
+  design-foundation:
+    source_globs:
+      - "docs/architecture/**/*.md"
+  forbidden-patterns:
+    source_globs:
+      - "docs/architecture/**/*.md"
+  known-pitfalls:
+    source_globs:
+      - "docs/decisions/**/*.md"
+  available-resources:
+    source_globs:
+      - "src/"
+      - "app/"
+  architecture-paradigm:
+    source_globs:
+      - "docs/architecture/**/*.md"
+      - "README.md"

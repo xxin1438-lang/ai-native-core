@@ -1,0 +1,21 @@
+# backend-java manifest overrides
+
+factors:
+  design-foundation:
+    source_globs:
+      - "docs/architecture/**/*.md"
+  forbidden-patterns:
+    source_globs:
+      - "docs/architecture/**/*.md"
+      - "docs/standards/**/*.md"
+  known-pitfalls:
+    source_globs:
+      - "docs/decisions/**/*.md"
+  available-resources:
+    source_globs:
+      - "src/main/java/"
+      - "src/main/resources/"
+  architecture-paradigm:
+    source_globs:
+      - "docs/architecture/**/*.md"
+      - "README.md"

@@ -129,8 +129,15 @@ function doInit(stacks, isForce, answers = {}) {
     return c;
   });
 
-  copyFile('config/acceptance.yaml', '.ai-native/acceptance.yaml');
-  copyFile('config/memory-manifest.yaml', '.ai-native/memory/MANIFEST.yaml');
+  // Apply adapter overrides
+  const primaryStack = stacks[0];
+
+  copyFile('config/acceptance.yaml', '.ai-native/acceptance.yaml', c => {
+    return applyAdapterOverrides('acceptance', c, primaryStack);
+  });
+  copyFile('config/memory-manifest.yaml', '.ai-native/memory/MANIFEST.yaml', c => {
+    return applyAdapterOverrides('manifest', c, primaryStack);
+  });
 
   const su = path.join(root, 'docs', 'self-update.md');
   if (!fs.existsSync(su)) fs.writeFileSync(su, '# AI Native 范式变更日志\n\n记录范式文件的系统性变更。\n\n---\n');
@@ -170,6 +177,84 @@ function inferFromStacks(stacks) {
   }
 
   return answers;
+}
+
+function applyAdapterOverrides(type, content, stack) {
+  const overridePath = path.join(__dirname, '..', '..', 'adapters', stack,
+    type === 'acceptance' ? 'acceptance-overrides.yaml' : 'manifest-overrides.yaml');
+
+  if (!fs.existsSync(overridePath)) return content;
+
+  if (type === 'acceptance') {
+    const overrides = parseSimpleYaml(fs.readFileSync(overridePath, 'utf-8'));
+    const phases = overrides.phase_overrides || {};
+    for (const [phase, checks] of Object.entries(phases)) {
+      for (const [checkId, cfg] of Object.entries(checks)) {
+        if (cfg.run) {
+          const escaped = cfg.run.replace(/\$/g, '$$$$');
+          content = content.replace(
+            new RegExp(`(${checkId}.*?\\n.*?run: ).*`, 's'),
+            `$1"${escaped}"`
+          );
+        }
+      }
+    }
+  }
+
+  if (type === 'manifest') {
+    const overrides = parseSimpleYaml(fs.readFileSync(overridePath, 'utf-8'));
+    const factors = overrides.factors || {};
+    for (const [name, cfg] of Object.entries(factors)) {
+      if (cfg.source_globs && Array.isArray(cfg.source_globs)) {
+        const globsYaml = cfg.source_globs.map(g => `      - "${g}"`).join('\n');
+        content = content.replace(
+          new RegExp(`(name: ${name}\\n(?:.*\\n)*?)\\s* source_globs:.*?(?=\\n  - name:|$)`, 's'),
+          `$1    source_globs:\n${globsYaml}`
+        );
+      }
+    }
+  }
+
+  return content;
+}
+
+function parseSimpleYaml(content) {
+  const result = {};
+  const lines = content.split('\n');
+  let currentSection = result;
+  let sectionStack = [result];
+  let currentKey = null;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const indent = line.search(/\S/);
+
+    const kvMatch = trimmed.match(/^(\S+):\s*(.*)/);
+    if (kvMatch && !trimmed.startsWith('-')) {
+      const key = kvMatch[1];
+      const val = kvMatch[2].trim();
+      if (val) {
+        currentSection[key] = val.replace(/"/g, '');
+      } else {
+        currentSection[key] = {};
+        sectionStack.push(currentSection);
+        currentSection = currentSection[key];
+      }
+      currentKey = key;
+    } else if (trimmed.startsWith('- ')) {
+      const val = trimmed.replace('- ', '').replace(/"/g, '');
+      if (Array.isArray(currentSection)) {
+        currentSection.push(val);
+      } else if (currentKey) {
+        if (!Array.isArray(currentSection[currentKey])) {
+          currentSection[currentKey] = [];
+        }
+        currentSection[currentKey].push(val);
+      }
+    }
+  }
+  return result;
 }
 
 function doDirectInit(stacks, isForce, answers, lang) {
