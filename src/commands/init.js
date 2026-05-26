@@ -146,6 +146,8 @@ function doInit(stacks, isForce, answers = {}) {
   console.log('  1. ai-native sync');
   console.log('  2. ai-native hooks install');
   console.log('  3. ai-native accept');
+
+  showSkillRecommendations(stacks);
 }
 
 function inferFromStacks(stacks) {
@@ -255,6 +257,36 @@ function parseSimpleYaml(content) {
     }
   }
   return result;
+}
+
+function showSkillRecommendations(stacks) {
+  const frontend = ['react-spa', 'nextjs', 'vue'];
+  const backend = ['backend-java', 'backend-go', 'backend-python'];
+  const hasFrontend = stacks.some(s => frontend.includes(s));
+  const hasBackend = stacks.some(s => backend.includes(s));
+
+  const plugins = [];
+  const mcps = [];
+
+  // Everyone needs OpenSpec
+  plugins.push({ name: 'OpenSpec (opsx)', why: 'SDD 门禁：explore → propose → apply → archive' });
+
+  // Everyone needs chrome MCP for visual verification
+  mcps.push({ name: 'chrome-mcp', why: 'E2E 双轨视觉验证' });
+
+  if (hasFrontend) {
+    plugins.push({ name: 'frontend-design', why: 'UI 代码生成辅助' });
+  }
+
+  if (hasBackend) {
+    plugins.push({ name: 'API 契约生成', why: '基于 Controller 自动生成 OpenAPI spec（计划中）' });
+  }
+
+  console.log('\n📦 推荐安装:');
+  console.log('  Plugin:');
+  plugins.forEach(p => console.log(`    - ${p.name}  (${p.why})`));
+  console.log('  MCP:');
+  mcps.forEach(m => console.log(`    - ${m.name}  (${m.why})`));
 }
 
 function doDirectInit(stacks, isForce, answers, lang) {
