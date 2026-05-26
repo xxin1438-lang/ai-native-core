@@ -60,4 +60,4 @@ ai-native accept           # acceptance
 
 **Docs**: [Guide](./docs/user-guide.md) · [Arch](./docs/design/architecture.md) · [Skills](./docs/design/skills-catalog.md)
 
-**Version** `v0.3.7`
+**Version** `v0.3.8`
