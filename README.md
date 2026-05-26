@@ -125,5 +125,6 @@ ai-native-core/
 
 当前为设计阶段。
 
-- **使用指南** → `docs/user-guide.md`
+- **使用指南** → `docs/user-guide.md`（含产品/前端/后端/测试角色入口）
+- **Skill 目录** → `docs/design/skills-catalog.md`（各角色推荐 Skill）
 - **架构设计** → `docs/design/architecture.md`

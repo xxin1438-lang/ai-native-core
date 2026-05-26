@@ -1,10 +1,64 @@
 # AI Native Core 使用指南
 
-本文档面向团队开发者，说明如何在项目中安装、配置和使用 ai-native-core。
+按角色选择入口：
+
+| 我是 | 从这里开始 | 我需要做什么 |
+|------|-----------|-------------|
+| **产品经理** | [角色：产品经理](#角色产品经理) | 写 PRD → AI 检查 → review 骨架图 |
+| **前端开发** | [角色：前端开发](#角色前端开发) | init → sync → propose → apply → accept |
+| **后端开发** | [角色：后端开发](#角色后端开发) | 同上 |
+| **测试/QA** | [角色：测试qa](#角色测试qa) | accept → E2E → 视觉走查 |
 
 ---
 
-## 一、安装
+## 角色：产品经理
+
+> PM 不用装 Node.js，不用跑命令行。只需要写 PRD 和看图。
+
+1. **写 PRD** — 放在 `docs/prd/feature-name.md`
+2. **AI 自动蒸馏** — 开发者 sync 后自动纳入产品约束
+3. **Review 骨架图** — 开发者 propose 后看 `design.md` ASCII 图，确认流程
+4. **确认或提出修改** — 不看代码
+
+需要的 Skill：**PRD Review** 📋（AI 检查 PRD 完整性）、**Design Review** 📋（审查骨架图）。
+
+详见 [§九 SDD 工作流](#九sdd-工作流openspec) 和 `docs/design/product-collaboration.md`。
+
+---
+
+## 角色：前端开发
+
+```bash
+ai-native init --stack react-spa && ai-native sync && ai-native hooks install
+```
+
+日常：`git pull && ai-native sync --check` → `/opsx:propose` → `/opsx:apply` → `ai-native accept`
+
+需要的 Skill：OpenSpec 🔧、chrome-mcp 🔧、frontend-design 🔧、sync/studybook ✅
+
+---
+
+## 角色：后端开发
+
+```bash
+ai-native init --stack backend-java && ai-native sync && ai-native hooks install
+```
+
+日常同上。需要的 Skill：OpenSpec 🔧、sync ✅、API 契约生成 📋、Migration 审查 📋
+
+---
+
+## 角色：测试/QA
+
+1. 验收：`ai-native accept` 自动跑全流程
+2. E2E 双轨：Playwright 无头 + chrome MCP 视觉走查
+3. 报告：`.ai-native/reports/` 下结构化验收报告
+
+需要的 Skill：chrome-mcp 🔧、acceptance ✅、E2E Spec 生成 📋
+
+---
+
+## 一、安装（开发者）
 
 ```bash
 npm install -g ai-native-core
