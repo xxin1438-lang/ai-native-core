@@ -58,7 +58,17 @@ function interactiveInit(isForce) {
     }
     if (type === 'cli') answers.ts = await ask('TypeScript? (yes/no)', 'yes');
 
-    answers.pm = await ask('包管理器 (pnpm/npm/yarn)', 'pnpm');
+    if (type === 'backend' || type === 'fullstack') {
+      const lang = stacks.find(s => s.startsWith('backend-'))?.replace('backend-', '') || 'java';
+      const pmOpts = { java: 'maven/gradle', go: 'go mod', python: 'pip/poetry' };
+      const pmDefault = { java: 'maven', go: 'go mod', python: 'pip' };
+      if (type === 'fullstack') {
+        answers.pm = await ask(`包管理器 (${pmOpts[lang] || 'maven'})`, pmDefault[lang] || 'maven');
+      }
+    }
+    if (!answers.pm && type !== 'backend') {
+      answers.pm = await ask('包管理器 (pnpm/npm/yarn)', 'pnpm');
+    }
 
     if (type === 'backend') {
       const lang = stacks[0].replace('backend-', '');
@@ -143,8 +153,10 @@ function inferFromStacks(stacks) {
   if (hasBackend) {
     const lang = stacks.find(s => s.startsWith('backend-')).replace('backend-', '');
     answers.test = { java: 'junit', go: 'go-test', python: 'pytest' }[lang] || 'junit';
+    answers.pm = { java: 'maven', go: 'go mod', python: 'pip' }[lang] || 'maven';
   } else {
     answers.test = 'vitest';
+    answers.pm = 'pnpm';
   }
 
   if (hasFrontend) {

@@ -114,6 +114,9 @@ metadata:
   // Generate AI tool configs
   generateAIConfigs(root, config, manifest);
 
+  // Install skill to project
+  installSkill(root);
+
   console.log(`[ai-native] Done. hash: ${currentHash.substring(0, 8)}`);
   showFactorSummary(memoryDir, lang);
 }
@@ -173,6 +176,19 @@ function generateAIConfigs(root, config, manifest) {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(root, t.file), t.content);
   }
+}
+
+function installSkill(root) {
+  const skillSrc = path.join(__dirname, '..', '..', 'skills', 'ai-native', 'SKILL.md');
+  if (!fs.existsSync(skillSrc)) return;
+
+  // Install to Claude, DeepSeek, Codex skill dirs
+  const targets = ['.claude', '.deepseek', '.codex'];
+  targets.forEach(dir => {
+    const dstDir = path.join(root, dir, 'skills', 'ai-native');
+    if (!fs.existsSync(dstDir)) fs.mkdirSync(dstDir, { recursive: true });
+    fs.copyFileSync(skillSrc, path.join(dstDir, 'SKILL.md'));
+  });
 }
 
 function showFactorSummary(memoryDir, lang) {

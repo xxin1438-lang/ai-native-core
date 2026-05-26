@@ -23,7 +23,7 @@ description = ""
 # 可选值：react-spa | nextjs | vue | backend-go | backend-python | backend-java
 adapter = "react-spa"
 
-# 包管理器：pnpm | npm | yarn | bun
+# 包管理器：pnpm | npm | yarn | bun | maven | gradle | pip
 package_manager = "pnpm"
 
 # CSS 方案（前端项目）：tailwind-v4 | tailwind-v3 | css-modules | styled-components | none
