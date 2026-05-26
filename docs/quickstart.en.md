@@ -1,21 +1,21 @@
-# 快速上手
+# Quick Start
 
 [中文](./quickstart.md) | [English](./quickstart.en.md)
 
 ---
 
-## 新项目
+## New Project
 
 ```bash
 cd your-project
-ai-native                  # 一键启动
+ai-native                  # one-shot: detect → confirm → init → sync
 ai-native hooks install
 ai-native accept
 ```
 
-手动：`ai-native init --stack backend-java && ai-native sync`
+Manual: `ai-native init --stack backend-java && ai-native sync`
 
-## 日常
+## Daily
 
 ```bash
 git pull && ai-native sync --check
@@ -26,16 +26,16 @@ ai-native accept
 ## Sync
 
 ```
-→ 写适配器规则 → 记忆因子
-→ 同步模板 → AI 配置
-→ 显示摘要
+→ writes adapter rules → memory factors
+→ template copy-back → AI config generation
+→ summary display
 ```
 
-内置规则立即生效（18-32 条约束）。
+Built-in rules active immediately (18-32 constraints).
 
-## AI 工具
+## AI Tools
 
-| 工具 | 文件 |
+| Tool | File |
 |------|------|
 | Claude Code | `.claude/CLAUDE.md` |
 | Cursor | `.cursor/rules/ai-native.md` |
@@ -43,5 +43,5 @@ ai-native accept
 | Codex | `.codex/rules/ai-native.md` |
 
 ```toml
-engines = ["all"]   # 一次生成全部
+engines = ["all"]   # generate all at once
 ```

@@ -1,5 +1,7 @@
 # Git 提交与审核指南
 
+[中文](./git-guide.md) | [English](./git-guide.en.md)
+
 ## 文件分类
 
 | 文件 | 提交 | 审核 | 说明 |

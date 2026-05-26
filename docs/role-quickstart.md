@@ -1,5 +1,7 @@
 # 各角色使用手册
 
+[中文](./role-quickstart.md) | [English](./role-quickstart.en.md)
+
 打开 AI，按角色说第一句话。
 
 ---
