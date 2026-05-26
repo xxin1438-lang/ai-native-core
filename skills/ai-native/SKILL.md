@@ -1,30 +1,49 @@
 ---
 name: ai-native
-description: AI Native Core commands — 在对话中直接操作 ai-native（init/sync/accept/show/hooks）。当用户说 /ai-native 或提到初始化 AI 项目、蒸馏记忆因子、验收等时使用。
+description: AI Native Core 全流程——直接在对话中初始化/蒸馏/验收。用户说 /ai-native init/sync/accept/show 时自动执行。
 metadata:
-  short-description: Operate ai-native-core from chat
+  short-description: AI-native init/sync/accept from chat
 ---
 
 # AI Native Core
 
-在对话中直接执行 ai-native 命令。
+在对话中直接完成，**不切终端**。
 
-## 命令
+## /ai-native init
 
-| 输入 | 终端命令 |
-|------|---------|
-| `/ai-native init` | `ai-native init` |
-| `/ai-native sync` | `ai-native sync` |
-| `/ai-native sync --check` | `ai-native sync --check` |
-| `/ai-native sync --force` | `ai-native sync --force` |
-| `/ai-native accept` | `ai-native accept` |
-| `/ai-native show` | `ai-native show` |
-| `/ai-native hooks install` | `ai-native hooks install` |
-| `/ai-native hooks status` | `ai-native hooks status` |
+1. `git rev-parse --show-toplevel` 获取项目根
+2. 扫描 `pom.xml`/`package.json`/`go.mod`/`pyproject.toml` 检测语言和版本
+3. 向用户确认检测结果（或让用户选择）
+4. 创建 `.ai-native/memory/`、`.ai-native/hooks/`、`docs/decisions/` 等目录
+5. 生成 `.ai-native/config.toml`（adapter/type/pm/test 按检测结果填写）
+6. 复制 `acceptance.yaml`、`MANIFEST.yaml` 模板
+7. 创建 `docs/self-update.md`
 
-## 规则
+适配器映射：pom.xml→backend-java(maven)、package.json+react→react-spa、go.mod→backend-go
 
-1. 在项目根目录执行（`git rev-parse --show-toplevel`）
-2. sync 后读取 `.ai-native/memory/` 因子文件
-3. accept 后读取 `.ai-native/reports/` 报告
-4. init 后提示下一步：sync → hooks install → accept
+## /ai-native sync
+
+1. 读 `.ai-native/memory/MANIFEST.yaml`
+2. 加载 `adapters/{stack}/immutable-rules.md` 内置规则
+3. 为每个因子写入内容到 `.ai-native/memory/*.md`（含 YAML frontmatter：name/description/metadata）
+4. 写入 `SYNC-STATE.md`
+5. 同步 `docs/.ai-native/memory/`
+6. 生成 `.claude/CLAUDE.md`、`.cursor/rules/ai-native.md`、`.deepseek/rules/ai-native.md`
+7. 展示摘要（每个因子的条数和前 3 条）
+
+## /ai-native accept
+
+1. 环境检查：node/git/.ai-native/memory/SYNC-STATE.md
+2. SDD 检查：openspec/changes/ 目录
+3. 代码质量：lint/typecheck/test
+4. E2E：e2e + 视觉走查
+5. 构建：build
+6. 输出报告到 `.ai-native/reports/`
+
+## /ai-native show [factor]
+
+列记忆因子或显示具体因子内容。
+
+## /ai-native hooks install
+
+生成 studybook-reminder.sh + paradigm-change-monitor.sh 到 `.ai-native/hooks/`，更新 `.claude/settings.json`。

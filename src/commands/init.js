@@ -64,9 +64,11 @@ function interactiveInit(isForce) {
       const pmDefault = { java: 'maven', go: 'go mod', python: 'pip' };
       if (type === 'fullstack') {
         answers.pm = await ask(`包管理器 (${pmOpts[lang] || 'maven'})`, pmDefault[lang] || 'maven');
+      } else {
+        answers.pm = pmDefault[lang] || 'maven';
       }
     }
-    if (!answers.pm && type !== 'backend') {
+    if (!answers.pm) {
       answers.pm = await ask('包管理器 (pnpm/npm/yarn)', 'pnpm');
     }
 
