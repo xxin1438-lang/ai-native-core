@@ -158,4 +158,7 @@ function inferFromStacks(stacks) {
   return answers;
 }
 
-module.exports = { run };
+function doDirectInit(stacks, isForce, answers, lang) {
+  doInit(stacks, isForce, answers);
+}
+module.exports = { run, doDirectInit };

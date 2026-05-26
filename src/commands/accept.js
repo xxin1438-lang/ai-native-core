@@ -5,7 +5,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 const { getProjectRoot, loadConfig } = require('../core/config');
 
-function run(args) {
+function run(args, lang) {
   const isCI = args.includes('--ci');
   const root = getProjectRoot();
   const config = loadConfig(root);

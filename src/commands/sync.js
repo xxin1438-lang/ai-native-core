@@ -6,7 +6,7 @@ const { execSync } = require('child_process');
 const { getProjectRoot, loadConfig, loadManifest } = require('../core/config');
 const { loadAdapterRules } = require('../core/adapter');
 
-function run(args) {
+function run(args, lang) {
   const isCheck = args.includes('--check');
   const isForce = args.includes('--force');
   const isDryRun = args.includes('--dry-run');
@@ -112,6 +112,7 @@ metadata:
   fs.copyFileSync(syncStatePath, path.join(tmplDir, 'SYNC-STATE.md'));
 
   console.log(`[ai-native] Done. hash: ${currentHash.substring(0, 8)}`);
+  showFactorSummary(memoryDir, lang);
 }
 
 function buildFactor(factor, builtinContent, hash) {
@@ -144,6 +145,24 @@ function mergeAdapterRules(adapters) {
     }
   }
   return merged;
+}
+
+function showFactorSummary(memoryDir, lang) {
+  const t = (k) => require('../core/i18n').t(k, lang || 'zh');
+  const zh = (lang || 'zh') === 'zh';
+
+  console.log(`\n${zh ? '━━━ AI 现在知道这些约束 ━━━' : '━━━ AI now knows ━━━'}`);
+  const files = fs.readdirSync(memoryDir).filter(f => f.endsWith('.md') && f !== 'SYNC-STATE.md');
+  files.forEach(f => {
+    const content = fs.readFileSync(path.join(memoryDir, f), 'utf-8');
+    const items = content.split('\n').filter(l => l.startsWith('- '));
+    if (items.length > 0) {
+      console.log(`\n${zh ? '✓' : '✓'} ${f.replace('.md', '')} (${items.length} ${zh ? '条' : 'items'})`);
+      items.slice(0, 3).forEach(l => console.log(`  • ${l.replace('- ', '')}`));
+      if (items.length > 3) console.log(`  ${zh ? '…' : '…'} ${zh ? `还有 ${items.length - 3} 条` : `+${items.length - 3} more`}`);
+    }
+  });
+  console.log(`\n→ ${zh ? '下个 AI 会话自动生效。ai-native show <因子> 查看详情' : 'Effective next session. ai-native show <factor> for details'}\n`);
 }
 
 module.exports = { run };
