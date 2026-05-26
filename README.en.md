@@ -1,6 +1,6 @@
 # AI Native Core
 
-**Give any project AI-native capabilities — not another template repo, a runnable framework.**
+**AI auto-complies with your project rules. A runnable framework, not a template repo.**
 
 [中文](./README.md) | [English](./README.en.md)
 
@@ -8,68 +8,56 @@
 
 ## What
 
-A config-driven, adapter-pattern, stack-agnostic AI-native development framework.
+Config-driven, adapter-pattern, stack-agnostic AI-native framework.
 
-- **Asset Memory Engine**: project docs → LLM distillation → compact constraint factors → auto-loaded every AI session
-- **SDD Gate**: explore → propose → confirm → apply, no skipping
-- **Dual-track Verification**: code behavior (Playwright) + visual rendering (chrome MCP)
-- **Self-iteration Hooks**: auto-detect paradigm changes, prompt pitfall reviews
-- **Acceptance Automation**: YAML config → auto-execute → structured report
-- **Multi-role**: PM / Frontend / Backend / QA, each has an entry point
+- **Asset Memory**: docs → distillation → memory factors → auto-loaded every session
+- **SDD Gate**: explore → propose → confirm → apply
+- **Dual-track Verify**: code + visual
+- **Self-iteration**: paradigm detection + pitfall reviews
+- **Acceptance**: YAML → one command → report
+- **Multi-role**: PM / Frontend / Backend / QA
 
-### Core Value
+## Why
 
-**AI auto-complies with your project rules. No need to repeat yourself every session.**
+**AI doesn't know your rules. You repeat yourself every session.**
 
-| Scenario | Effect |
-|----------|--------|
-| Daily dev | AI loads memory factors — "No direct DB access from Controller" → AI won't do it |
-| Rule change | Update docs → `ai-native sync` → AI complies next session |
-| Acceptance | `ai-native accept` runs lint/typecheck/test/e2e/build in one command |
+| Without | With ai-native |
+|---------|---------------|
+| AI puts logic in Controller | AI sees "No direct DB from Controller", won't do it |
+| Same CR issues every time | forbidden-patterns distilled once, enforced forever |
+| New hires read 20 docs | `init && sync`, AI guides with rules |
+| Rule changes by word of mouth | Edit docs → `sync` → all agents update |
+| 6 commands for acceptance | `ai-native accept` — one command |
 
-## Quick Start
+**Three scenarios**:
+
+| Scenario | You | Effect |
+|----------|-----|--------|
+| Daily dev | Nothing | AI auto-loads memory factors |
+| Rule change | Edit docs → `ai-native sync` | AI complies next session |
+| Pre-commit | `ai-native accept` | One-command check |
+
+## How
 
 ```bash
 npm install -g ai-native-core
 cd your-project
-ai-native init                  # interactive, or --stack react-spa
-ai-native sync && ai-native hooks install && ai-native accept
+ai-native                  # one-shot
+ai-native hooks install    # hooks
+ai-native accept           # acceptance
 ```
 
-## Supported Stacks
+**Stacks**: `react-spa` `nextjs` `vue` `backend-java` `backend-go` `backend-python`
 
-| Type | Adapter |
-|------|---------|
-| Frontend | `react-spa` `nextjs` `vue` |
-| Backend | `backend-java` `backend-go` `backend-python` |
-| Multi | comma-separated: `react-spa,backend-java` |
+**By role**: [Role Quickstart](./docs/role-quickstart.md)
 
-## Team Roles
+| Role | First words |
+|------|------------|
+| PM | `review PRD` |
+| Frontend | `/ai-native init` |
+| Backend | `/ai-native init` |
+| QA | `/ai-native accept` |
 
-| Role | Needs | Recommended Skill |
-|------|-------|-------------------|
-| PM | Write PRD → review wireframe | PRD Review |
-| Frontend | init → sync → propose → apply → accept | OpenSpec + chrome-mcp |
-| Backend | same as above | OpenSpec + API contract gen |
-| QA | accept → E2E dual-track → report | chrome-mcp |
+**Docs**: [Guide](./docs/user-guide.md) · [Arch](./docs/design/architecture.md) · [Skills](./docs/design/skills-catalog.md)
 
-## Docs
-
-| Doc | Description |
-|-----|-------------|
-| [User Guide](./docs/user-guide.md) | Role-based manual (Chinese) |
-| [Architecture](./docs/design/architecture.md) | 5-layer design (Chinese) |
-| [Skill Catalog](./docs/design/skills-catalog.md) | Recommended skills by role (Chinese) |
-| [Product Collab](./docs/design/product-collaboration.md) | PM collaboration mode (Chinese) |
-
-## Principles
-
-1. **Config > Code**
-2. **Adapter Isolation**
-3. **Progressive Adoption**
-4. **LLM Agnostic**
-5. **Auditable by Reading**
-
-## Version
-
-`v0.2.x` — CLI functional (init / sync / accept / hooks).
+**Version** `v0.3.7`
