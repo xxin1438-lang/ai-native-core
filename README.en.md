@@ -58,6 +58,6 @@ ai-native accept           # acceptance
 | Backend | `/ai-native init` |
 | QA | `/ai-native accept` |
 
-**Docs**: [Guide](./docs/user-guide.md) · [Arch](./docs/design/architecture.md) · [Skills](./docs/design/skills-catalog.md)
+**Docs**: [Quickstart](./docs/quickstart.en.md) · [Roles](./docs/role-quickstart.en.md) · [Git](./docs/git-guide.en.md) · [Arch](./docs/design/architecture.md)
 
 

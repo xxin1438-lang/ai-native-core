@@ -58,6 +58,6 @@ ai-native accept           # 验收
 | 后端 | `/ai-native init` |
 | 测试 | `/ai-native accept` |
 
-**文档**：[使用指南](./docs/user-guide.md) · [架构](./docs/design/architecture.md) · [Skill](./docs/design/skills-catalog.md)
+**文档**：[快速上手](./docs/quickstart.md) · [角色手册](./docs/role-quickstart.md) · [Git 指南](./docs/git-guide.md) · [架构](./docs/design/architecture.md)
 
 
