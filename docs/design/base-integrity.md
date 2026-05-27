@@ -1,126 +1,96 @@
-# 基座完整性保护
+# Base Integrity Protection
 
-本文档定义 ai-native-core 的基座文件和用户空间文件的边界，以及防止基座被意外修改的保护机制。
+File classification and protection mechanisms preventing accidental base modification.
 
 ---
 
-## 一、文件分类
+## File Classification
 
-### 框架基座（不可编辑）
+### Framework Base (read-only)
 
-这些文件由框架提供，不在项目目录中，随框架版本升级更新。
+Installed via npm, outside project directory.
 
-| 文件 | 位置 | 修改方式 |
-|------|------|---------|
-| 适配器内置规则 `immutable-rules.md` | npm 全局包 | 框架版本升级 |
-| 蒸馏引擎核心 | npm 全局包 CLI | 框架版本升级 |
-| Hook 脚本模板 | npm 全局包 | 框架版本升级 |
+| File | Location | Updated via |
+|------|----------|-------------|
+| Adapter immutable-rules | npm global package | Framework version upgrade |
+| Distiller engine | npm global package CLI | Framework version upgrade |
+| Hook script templates | npm global package | Framework version upgrade |
 
-> `npm install -g ai-native-core` 后，框架文件在全局 npm 目录中，**不在项目目录**。
+### Project Config (editable, git-review protected)
 
-### 项目配置（可编辑，受 git review 保护）
+| File | Edited by | Protection |
+|------|-----------|------------|
+| `.ai-native/config.toml` | Project owner | PR review |
+| `.ai-native/acceptance.yaml` | Project owner | PR review |
+| `.ai-native/memory/MANIFEST.yaml` | Project owner | PR review |
+| `docs/decisions/*.md` | AI (authorized) | PR review |
 
-| 文件 | 谁编辑 | 保护方式 |
-|------|--------|---------|
-| `.ai-native/config.toml` | 项目 owner | git PR review |
-| `.ai-native/acceptance.yaml` | 项目 owner | git PR review |
-| `.ai-native/memory/MANIFEST.yaml` | 项目 owner | git PR review |
-| `docs/self-update.md` | AI（经授权）| git PR review |
-| `docs/decisions/*.md` | AI（经授权）| git PR review |
+### Local Generated (gitignored, overwritten by sync)
 
-### 本机生成（gitignored，sync 自动覆盖）
-
-| 文件 | 生成者 | 提交？ |
-|------|--------|--------|
+| File | Generator | Git |
+|------|-----------|-----|
 | `.ai-native/memory/*.md` | `ai-native sync` | ❌ gitignored |
-| `.ai-native/memory/SYNC-STATE.md` | `ai-native sync` | ❌ gitignored |
 | `.ai-native/reports/*.md` | `ai-native accept` | ❌ gitignored |
 | `.ai-native/hooks/*.sh` | `ai-native hooks install` | ❌ gitignored |
 
-### 模板同步（提交，sync 自动覆盖）
+### Template Sync (committed, overwritten by sync)
 
-| 文件 | 生成者 | 何时覆盖 |
-|------|--------|---------|
-| `docs/.ai-native/memory/*.md` | `ai-native sync` copy-back | 每次 sync |
-| `.claude/CLAUDE.md` | `ai-native sync` | sync 时检查补全 |
-| `.claude/settings.json` | `ai-native hooks install` | hooks 变更时 |
+| File | Generator | When overwritten |
+|------|-----------|------------------|
+| `docs/.ai-native/memory/*.md` | `ai-native sync` copy-back | Each sync |
+| `.claude/CLAUDE.md` | `ai-native sync` | Sync check |
 
----
+## Five-Layer Protection
 
-## 二、五层保护
-
-### ① 框架文件不在项目目录
+### ① Framework files not in project directory
 
 ```
 npm install -g ai-native-core
-→ 安装在 /usr/local/lib/node_modules/ai-native-core/
-→ 项目目录只有 .ai-native/ 配置文件
-→ 团队成员无法触及适配器内置规则
+→ installed in /usr/local/lib/node_modules/ai-native-core/
+→ project has only .ai-native/config files
+→ team members cannot touch adapter rules
 ```
 
-### ② 适配器规则从 npm 包加载
+### ② Adapter rules loaded from npm package
 
-蒸馏引擎运行时：
+Distiller at runtime:
 ```
-1. 读 .ai-native/config.toml → adapter = "react-spa"
-2. 从 npm 包加载 adapters/react-spa/immutable-rules.md
-3. 从项目加载 source_globs 匹配的文档
-4. 合并蒸馏 → 写入记忆因子
+1. Read .ai-native/config.toml → adapter = "react-spa"
+2. Load adapters/react-spa/immutable-rules.md from npm package
+3. Load project docs via source_globs
+4. Merge → write memory factors
 ```
 
-适配器规则文件不在项目目录，无法通过 git commit 修改。
+### ③ Config files PR-reviewed
 
-### ③ 配置文件受 git review 保护
+config.toml / acceptance.yaml / MANIFEST.yaml committed to git. Changes require PR review.
 
-config.toml / acceptance.yaml / MANIFEST.yaml 提交 git。任何修改需 PR review。
+### ④ Generated files overwritten by sync
 
-### ④ 自动生成文件被 sync 覆盖
+Manual edits to `.ai-native/memory/`:
+- Already gitignored
+- Next `ai-native sync` overwrites fully
 
-手动修改 `.ai-native/memory/` 下的文件：
-- 已被 `.gitignore` 排除
-- 下次 `ai-native sync` 全量覆盖
-- Pre-Write 防膨胀保证不读取旧记忆作为输入
+### ⑤ Sync never overwrites project config
 
-### ⑤ sync 不覆盖项目配置文件
-
-`ai-native sync` 只覆盖：
+`ai-native sync` only touches:
 - `.ai-native/memory/*.md`
 - `docs/.ai-native/memory/*.md`
 - `.claude/CLAUDE.md`
 
-**绝不覆盖**：config.toml / acceptance.yaml / MANIFEST.yaml / 项目文档。
+**Never overwrites**: config.toml / acceptance.yaml / MANIFEST.yaml / project docs.
 
----
-
-## 三、错误场景
-
-| 场景 | 后果 | 保护 |
-|------|------|------|
-| 手动修改 `.ai-native/memory/` | 下次 sync 覆盖 → 无影响 | gitignore + sync |
-| 修改 config.toml 换适配器 | 基座改变 → 需 review | git PR |
-| 修改项目文档 | **期望行为** → sync 重新蒸馏 | Hook 提醒 |
-| 修改 immutable-rules.md | **不可能**（不在项目目录） | npm 全局安装 |
-| 框架升级 | 适配器规则更新 → 下次 sync 纳入 | 版本管理 |
-| 提交了 .ai-native/memory/ | 取决于 .gitignore | 建议配置见下 |
-
----
-
-## 四、.gitignore
+## .gitignore
 
 ```gitignore
-# 本机生成（不提交）
 .ai-native/memory/
 .ai-native/reports/
 .ai-native/hooks/
-
-# 保留配置
 !.ai-native/config.toml
 !.ai-native/acceptance.yaml
 !.ai-native/memory/MANIFEST.yaml
 ```
 
----
+## Conclusion
 
-## 五、结论
-
-**任何人提交代码不会修改 ai-native-core 的基座。** 框架代码在 npm 包中，适配器规则从 npm 加载，项目配置受 git review 保护，自动生成文件被 sync 覆盖且不提交。
+**No one can modify ai-native-core's base by committing code.** Framework files are in the npm package, adapter rules loaded from npm, project config PR-protected, generated files gitignored.

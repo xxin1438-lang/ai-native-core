@@ -1,90 +1,88 @@
-# 设计理念与问题分析
+# Design Rationale
 
-## 核心洞察
+## Core Insight
 
-AI Agent 在项目中有效工作需要两类信息：
+AI agents need two types of information in a project:
 
-1. **会话级信息**：当前任务的上下文（用户说了什么、打开了哪些文件）
-2. **持久级信息**：项目的架构约束、设计规则、禁止模式、已知坑
+1. **Session info**: current task context (what the user said, which files are open)
+2. **Persistent info**: architecture constraints, design rules, forbidden patterns, known pitfalls
 
-大多数 AI 编码工具只解决第一类——每次新开会话，Agent 对项目一无所知。结果是：反复读文档、重复踩坑、风格不一致。
+Most AI coding tools only address the first type — every new session, the agent knows nothing about the project. Result: repeated doc reading, repeated mistakes, inconsistent style.
 
-`ai-native-core` 的核心思路：**把持久级信息从"需要读的文档"变成"自动加载的约束"**。
+`ai-native-core`'s core idea: **transform persistent info from "docs to read" into "constraints auto-loaded into every prompt"**.
 
-## 问题 → 方案映射
+## Problem → Solution
 
-### 问题 1：AI 每次都从零开始
+### Problem 1: AI starts from zero every session
 
-**表现**：新会话打开，Agent 不知道项目用什么框架、组件库、有哪些禁止写法。需要逐份阅读 README、设计文档、编码规范。
+**Manifestation**: Agent doesn't know which framework, component library, or coding conventions the project uses. Needs to read README, design docs, style guides from scratch.
 
-**方案**：资产记忆蒸馏。关键文档被蒸馏为 ≤100 行的紧凑因子文件，通过 CLAUDE.md 类文件自动注入到每次会话的 system prompt。
+**Solution**: Asset memory distillation. Key docs are distilled into ≤100-line compact factor files, auto-injected into the agent's system prompt every session via CLAUDE.md.
 
-### 问题 2：记忆因子耦合于具体项目
+### Problem 2: Memory factors coupled to specific project
 
-**表现**：每个项目的因子不同——前端项目需要设计约束，后端项目需要 API 契约和安全规则，CLI 项目两者都不需要。
+**Manifestation**: Each project needs different factors — frontend needs design constraints, backend needs API contracts, CLI projects need neither.
 
-**方案**：MANIFEST.yaml 声明式定义。因子类型、源文件路径、蒸馏 prompt 全部可配置。框架不预设"有哪些因子"。
+**Solution**: MANIFEST.yaml declarative definition. Factor types, source paths, distill prompts all configurable. The framework doesn't prescribe "which factors exist".
 
-### 问题 3：技术栈绑定
+### Problem 3: Tech stack lock-in
 
-**表现**：大多数 AI Native 方案（如模板仓库、custom instructions）绑定于特定框架。Vue 项目不能用 React 的 memory 模板。
+**Manifestation**: Most AI-native solutions (template repos, custom instructions) are framework-specific.
 
-**方案**：适配器模式。`adapters/react-spa/` 提供 React 专属模板和规则，`adapters/backend-go/` 提供 Go 后端的。框架核心引擎与栈无关。
+**Solution**: Adapter pattern. `adapters/react-spa/` provides React-specific templates and rules, `adapters/backend-go/` provides Go backend ones. Core engine is stack-agnostic.
 
-### 问题 4：验收流程靠人读文档
+### Problem 4: Acceptance relies on reading docs
 
-**表现**：onboarding 验收、发布前 check 靠 AI 读 markdown 文档理解语义再执行，结果不可靠，格式不统一。
+**Manifestation**: Onboarding acceptance and pre-release checks rely on AI reading markdown checklists — unreliable, inconsistent.
 
-**方案**：结构化验收管道。`acceptance.yaml` 定义 exec / file-exists / visual 三种 check 类型，框架自动执行并输出结构化报告。
+**Solution**: Structured acceptance pipeline. `acceptance.yaml` defines exec/file-exists/visual check types. Framework executes and outputs structured reports.
 
-### 问题 5：知识衰减
+### Problem 5: Knowledge decay
 
-**表现**：项目架构变更后（如换了状态管理方案、新增了安全规则），AI 仍在使用过时的记忆因子。
+**Manifestation**: After architecture changes (new state management, new security rules), AI still uses outdated memory factors.
 
-**方案**：自迭代 hooks。commit 时检测范式路径变更 → 提示更新变更日志 + 触发记忆重新蒸馏。踩坑复盘写入后自动提炼为新因子。
+**Solution**: Self-iteration hooks. Commits touching paradigm paths → prompt changelog update + trigger re-distillation.
 
-## 五层架构的为什么
+## Why Five Layers
 
-### Layer 1（配置层）：为什么是第一层
+### Layer 1 (Config): Why first?
 
-因为它是唯一可变的部分。框架代码不变，项目差异全部在这一层表达。一个 `config.toml` 切换 React → Vue → Go，框架行为随之变化。
+Because it's the only variable part. Framework code is constant; project differences are expressed in this layer. A single `config.toml` switches React → Vue → Go with adapter selection.
 
-### Layer 2（记忆层）：为什么用蒸馏而不是全文索引
+### Layer 2 (Memory): Why distillation over full-text indexing?
 
-全文索引（RAG）的问题是：返回的是原文片段，Agent 需要自己提炼约束。蒸馏的好处是：人类/LLM 在蒸馏时做了一次"约束提取"——源文件说"禁止在组件中直接调 toast()"，蒸馏结果就是这条规则本身，Agent 不需要再读源文。
+Full-text search (RAG) returns raw chunks — the agent still needs to extract constraints. Distillation does one "constraint extraction" pass. The source says "don't call toast() from components"; the distilled result IS that rule. No source re-reading needed.
 
-### Layer 3（SDD 层）：为什么强制 propose→apply
+### Layer 3 (SDD): Why enforce propose→apply?
 
-跳过 spec 写代码的后果不是立即显现的——AI 可能写了一个技术上正确但架构上错误的实现。SDD 门禁的作用是在实现前强制一次结构化的设计确认。
+Skipping spec and writing code isn't immediately wrong — the agent might write technically correct but architecturally wrong implementations. SDD gate forces a structured design confirmation before implementation.
 
-### Layer 4（自迭代层）：为什么需要 hooks 而不是人工触发
+### Layer 4 (Self-iteration): Why hooks over manual triggers?
 
-人工触发的困境：记得更新 → 忙起来忘了 → 记忆过时 → AI 犯错。hooks 自动化后，范式变更和踩坑复盘变成"被动发生的"，不需要任何人的记忆。
+Manual dilemma: remember to update → too busy → forget → stale memory → AI makes errors. Hooks make paradigm change detection and pitfall review passive — no one needs to remember.
 
-### Layer 5（验收层）：为什么是结构化配置而不是 checklist
+### Layer 5 (Acceptance): Why structured config over checklist?
 
-markdown checklist 的问题：AI 需要"理解文字 → 判断怎么做 → 执行"。结构化配置的区别：AI 只需"解析 YAML → 按 type 执行"，中间没有语义理解环节。结果可机器解析，跨项目可比。
+Markdown checklist problem: AI needs "understand text → decide what to do → execute". Structured config: AI only needs "parse YAML → execute by type". No semantic parsing middleman. Results machine-parsable and cross-project comparable.
 
-## 不做的事情
+## What We Don't Do
 
-以下是刻意不进入框架的能力，因为它们属于项目自身或上层工具：
+- **CI/CD pipeline**: framework defines acceptance checks, CI platform is project's choice
+- **Deployment**: not binding to any deployment target
+- **Monitoring**: operational, outside AI workflow
+- **UI components**: no component library; adapters declare "which library"
+- **Demo pages**: framework provides onboarding structure, not demo content
+- **Code generation templates**: framework only distills constraints, doesn't generate business code
 
-- **CI/CD 管道**：框架定义验收 checks，具体 CI 平台由项目选择
-- **部署**：框架不绑定部署目标
-- **监控/告警**：运维层面，非 AI 工作流
-- **特定 UI 组件**：框架不提供组件库，通过适配器声明"用什么组件库"
-- **特定 Demo 页面**：框架提供 onboarding 结构，不预设 Demo 内容
-- **代码生成模板**：框架只蒸馏约束，不生成业务代码
+## vs RAG / Vector DB
 
-## 与 RAG / 向量数据库的区别
+| | RAG | ai-native-core |
+|---|-----|---------------|
+| Storage | Vector DB (raw chunks) | Markdown files (distilled factors) |
+| Knowledge form | Raw snippets | Refined constraints |
+| Agent consumption | Retrieve → read original | Already in system prompt |
+| Update | Re-index | Re-distill (change-detected) |
+| Human-readable | No (vectors) | Yes (Markdown, auditable) |
+| Constraint strength | Weak (suggestive) | Strong (system prompt, directly affects behavior) |
 
-| | RAG 方案 | ai-native-core |
-|---|---------|---------------|
-| 存储 | 向量数据库（原文 chunk） | Markdown 文件（蒸馏因子） |
-| 知识形态 | 原文片段 | 提炼后的约束 |
-| Agent 消费方式 | 检索 → 阅读原文 | 直接注入 system prompt |
-| 更新方式 | 重新索引 | 重新蒸馏（变更检测触发） |
-| 人类可读 | 否（向量） | 是（Markdown，可审计） |
-| 约束强度 | 弱（建议性） | 强（system prompt，直接影响行为） |
-
-核心差异：RAG 解决"找到相关文档"，ai-native-core 解决"不需要找——约束已在 prompt 里"。
+Core difference: RAG solves "find relevant docs". ai-native-core solves "no need to search — constraints are already in the prompt".

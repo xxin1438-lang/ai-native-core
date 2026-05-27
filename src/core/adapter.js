@@ -18,11 +18,9 @@ function loadAdapterRules(adapterName) {
       if (!section.trim()) continue;
       const lines = section.split('\n');
       const heading = lines[0]?.replace(/^## /, '').trim();
-      if (heading && heading.includes('不可变')) {
-        // This is a forbidden-patterns section
-        rules['forbidden-patterns'] = (rules['forbidden-patterns'] || '') +
-          '\n' + lines.filter(l => l.startsWith('- ')).join('\n');
-      }
+      // All sections in immutable-rules.md contain forbidden patterns
+      rules['forbidden-patterns'] = (rules['forbidden-patterns'] || '') +
+        '\n' + lines.filter(l => l.startsWith('- ')).join('\n');
     }
   }
 
