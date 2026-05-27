@@ -1,95 +1,90 @@
 # =============================================================================
-# AI Native Core — 记忆因子清单
+# AI Native Core — Memory Factor Manifest
 # =============================================================================
-# 声明式定义每个记忆因子：从哪里来、蒸馏规则、质量标准
-# 执行 `ai-native sync` 时读取此文件
+# Declarative definition of memory factors. Read by ai-native sync.
 # =============================================================================
 
 version: 1
 
-# 默认蒸馏 prompt（所有因子共用，各因子可覆盖）
+# Default distillation prompt (shared, overridable per factor)
 default_distill_prompt: |
-  你是项目知识蒸馏器。从以下源文件中提取高信号约束。
-  要求：
-  - 每条一行，独立可操作，读一遍能做出正确决策
-  - 不是文件摘要，是直接影响行为的约束
-  - 禁止复制源文件原文，只输出蒸馏后的因子
+  You are a project knowledge distiller. Extract high-signal constraints from source files.
+  Rules:
+  - One line per item, independently actionable
+  - Not a summary — constraints that directly affect behavior
+  - No source copy-paste, only distilled factors
 
-# =============================================================================
-# 因子定义
-# =============================================================================
+# Factor definitions
 factors:
   - name: design-foundation
-    description: UI 开发行为约束：组件优先级、token 用法、布局规则
+    description: UI constraints — component priority, token usage, layout rules
     source_globs:
       - "design/**/*.md"
       - "design/**/*.css"
       - "docs/design-system/**/*.md"
     distill_prompt: |
-      提取设计约束：用什么组件库、token 怎么用、布局规则、禁止的写法。
-      聚焦"怎么做"而非"有什么"。
+      Extract design constraints: component library, token usage, layout rules, forbidden patterns.
+      Focus on "how to do" not "what exists".
     max_items: 15
     priority: critical
     output_file: "design-foundation.md"
 
   - name: forbidden-patterns
-    description: 明确禁止的行为红线
+    description: Explicitly forbidden behaviors
     source_globs:
       - "docs/architecture/**/*.md"
       - "docs/standards/**/*.md"
       - ".github/workflows/*.yml"
     builtin_sources:
-      - "adapters/{stack}/immutable-rules.md"  # 适配器内置架构不变性规则，始终纳入蒸馏
+      - "adapters/{stack}/immutable-rules.md"  # adapter built-in rules, always included
     distill_prompt: |
-      提取所有"禁止"、"不允许"、"不要"开头的规则。
-      适配器内置规则（builtin_sources）具有最高优先级，必须全部保留。
-      项目文档中的规则作为补充。每条以"禁止"开头。标注来源。
+      Extract all "forbidden", "do not", "never" rules.
+      Adapter built-in rules (builtin_sources) have highest priority — keep all.
+      Project doc rules are supplemental. Prefix each with "禁止" or "DO NOT". Note source.
     max_items: 25
     priority: critical
     output_file: "forbidden-patterns.md"
 
   - name: known-pitfalls
-    description: 实战中踩过的坑
+    description: Pitfalls encountered in practice
     source_globs:
       - "docs/decisions/**/*.md"
       - "docs/postmortems/**/*.md"
     distill_prompt: |
-      提取踩坑记录。格式：`问题描述 → 根因 → 正确做法`。
-      每条一行。去重。
+      Extract pitfalls. Format: `symptom: root cause → fix`.
+      One per line. Deduplicate.
     max_items: 15
     priority: high
     output_file: "known-pitfalls.md"
 
   - name: available-resources
-    description: 现成可用资源索引
+    description: Available resources index
     source_globs:
       - "src/components/"
       - "src/hooks/"
       - "src/utils/"
       - "templates/"
     distill_prompt: |
-      列出可复用的组件、hooks、工具函数、模板。
-      格式：`名称 — 路径 — 一句话用途`。
+      List reusable components, hooks, utils, templates.
+      Format: `name — path — one-line purpose`.
     max_items: 20
     priority: high
     output_file: "available-resources.md"
 
   - name: architecture-paradigm
-    description: 架构决策和工作范式
+    description: Architecture decisions and workflow paradigms
     source_globs:
       - "docs/architecture/**/*.md"
       - "docs/adr/**/*.md"
       - "README.md"
     distill_prompt: |
-      提取架构决策、分层规则、数据流约束、状态管理策略。
-      每条一个决策点。
+      Extract architecture decisions, layering rules, data flow constraints.
+      One decision per line.
     max_items: 15
     priority: critical
     output_file: "architecture-paradigm.md"
 
-# =============================================================================
-# 蒸馏质量规则
-# =============================================================================
+# Quality rules
 quality:
   max_item_length: 200
   max_file_lines: 50
@@ -100,9 +95,7 @@ quality:
     - "详见"
     - "参考"
 
-# =============================================================================
-# SYNC-STATE 配置 + per-factor 增量 hash
-# =============================================================================
+# SYNC-STATE config
 sync_state:
   file: "SYNC-STATE.md"
   fields:
@@ -113,10 +106,7 @@ sync_state:
     - factors_synced
     - factor_hashes
 
-# =============================================================================
-# 记忆文件输出格式
-# =============================================================================
-# 详见 docs/design/memory-factor-spec.md
+# Memory file output format (see docs/design/memory-factor-spec.md)
 output_format:
   frontmatter:
     required:
@@ -130,9 +120,7 @@ output_format:
     item_prefix: "- "
     item_separator: "\n"
 
-# =============================================================================
 # Template sync
-# =============================================================================
 template_sync:
   enabled: true
   dir: "docs/.ai-native/memory/"
@@ -144,18 +132,16 @@ template_sync:
     - "architecture-paradigm.md"
     - "SYNC-STATE.md"
 
-# =============================================================================
-# AI 工具配置生成模板
-# =============================================================================
+# AI tool config generation
 ai_config_generation:
   claude:
     file: ".claude/CLAUDE.md"
     template: |
       # Project Context
 
-      ## 资产记忆因子
+      ## Memory Factors
 
-      以下文件由 `ai-native sync` 生成，首次使用或范式变更后需重新同步。
+      Generated by `ai-native sync`. Re-sync after paradigm changes.
 
       {memory_references}
 

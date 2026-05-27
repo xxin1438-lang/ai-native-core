@@ -1,4 +1,4 @@
-// ai-native core — config reader
+// config reader
 
 const fs = require('fs');
 const path = require('path');

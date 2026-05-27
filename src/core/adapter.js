@@ -1,4 +1,4 @@
-// ai-native core — adapter loader
+// adapter loader
 
 const fs = require('fs');
 const path = require('path');

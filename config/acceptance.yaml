@@ -1,23 +1,19 @@
 # =============================================================================
-# AI Native Core — 验收管道配置
+# AI Native Core — Acceptance Pipeline
 # =============================================================================
-# 定义 AI Agent 在 onboarding / 发布前必须通过的检查项
-# 执行 `ai-native accept` 时读取此文件
+# Define checks for ai-native accept. Edit to match project commands.
 # =============================================================================
 
 version: 1
 
-# 报告格式
 report:
   format: markdown
   output_dir: ".ai-native/reports/"
   filename_template: "acceptance-{date}-{status}.md"
 
-# =============================================================================
-# Phase 1 — 环境验收
-# =============================================================================
+# Phase 1 — Environment
 - name: environment
-  description: 开发环境基础检查
+  description: Basic environment checks
   checks:
     - id: node-version
       type: exec
@@ -37,18 +33,16 @@ report:
       type: file-exists
       paths:
         - ".ai-native/memory/SYNC-STATE.md"
-      message: "资产记忆未初始化，运行 ai-native sync"
+      message: "Memory not initialized. Run ai-native sync"
 
     - id: config-exists
       type: file-exists
       paths:
         - ".ai-native/config.toml"
 
-# =============================================================================
-# Phase 2 — 代码质量
-# =============================================================================
+# Phase 2 — Code quality
 - name: code-quality
-  description: 静态检查和类型验证
+  description: Static analysis and type checks
   checks:
     - id: lint
       type: exec
@@ -62,46 +56,29 @@ report:
       type: exec
       run: "pnpm test"
 
-# =============================================================================
-# Phase 3 — E2E（双轨）
-# =============================================================================
+# Phase 3 — E2E (dual track)
 - name: e2e
-  description: 端到端验证
+  description: End-to-end verification
   checks:
     - id: e2e-code
       type: exec
       run: "pnpm e2e"
-      label: "轨道 1 — 代码行为验证"
+      label: "Track 1 — Code behavior"
 
     - id: e2e-visual
       type: visual
       tool: "chrome-mcp"
-      label: "轨道 2 — 视觉渲染验证"
-      # optional: true   # 视觉走查失败不阻塞通过（当工具不可用时）
+      label: "Track 2 — Visual rendering"
 
-# =============================================================================
-# Phase 4 — 构建
-# =============================================================================
+# Phase 4 — Build
 - name: build
-  description: 生产构建验证
+  description: Production build verification
   checks:
     - id: build
       type: exec
       run: "pnpm build"
 
-# =============================================================================
-# Check 类型定义
-# =============================================================================
-# type: exec
-#   执行 shell 命令，exit code 0 为通过
-#   expect.pattern: 可选，校验 stdout 匹配正则
-#   expect.contains: 可选，校验 stdout 包含字符串
-#
-# type: file-exists
-#   检查文件/目录是否存在
-#   paths: string[]
-#
-# type: visual
-#   调用视觉验证工具（如 chrome-mcp）截图走查
-#   tool: chrome-mcp | playwright-mcp
-#   optional: 视觉验证失败是否阻塞（默认 false）
+# Check types:
+#   exec:   shell command, exit 0 = pass. expect.pattern = stdout regex
+#   file-exists: check paths exist
+#   visual: visual verification tool (chrome-mcp). optional = non-blocking

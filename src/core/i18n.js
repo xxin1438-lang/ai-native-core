@@ -49,7 +49,7 @@ function getLang(args) {
   const idx = args.indexOf('--lang');
   if (idx >= 0) return args[idx + 1] === 'en' ? 'en' : 'zh';
   if (process.env.LANG?.startsWith('zh')) return 'zh';
-  return 'zh';
+  return 'en';
 }
 
 function t(key, lang) {

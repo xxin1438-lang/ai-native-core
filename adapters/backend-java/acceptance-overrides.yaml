@@ -1,6 +1,5 @@
 # backend-java acceptance overrides
 
-# 这些命令会替换 acceptance.yaml 模板中的默认命令
 phase_overrides:
   code-quality:
     lint:
