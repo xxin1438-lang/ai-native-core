@@ -23,6 +23,9 @@
     "config/",
     "README.md"
   ],
+  "scripts": {
+    "test": "node tests/core.test.js"
+  },
   "engines": {
     "node": ">=18.0.0"
   }

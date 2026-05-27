@@ -47,7 +47,7 @@ ai-native hooks install    # hooks
 ai-native accept           # acceptance
 ```
 
-**Stacks**: `react-spa` `nextjs` `vue` `backend-java` `backend-go` `backend-python`
+**Stacks**: `react-spa` `nextjs` `vue` `backend-java` `backend-node` `backend-go` `backend-python`
 
 **By role**: [Role Quickstart](./docs/role-quickstart.md)
 

@@ -73,6 +73,26 @@ function run(args, lang) {
   const factors = targetFactor ? manifest.factors.filter(f => f.name === targetFactor) : manifest.factors;
   if (!fs.existsSync(memoryDir)) fs.mkdirSync(memoryDir, { recursive: true });
 
+  // Warn if source docs are missing
+  for (const factor of factors) {
+    const hasBuiltin = builtin[factor.name];
+    if (!hasBuiltin) {
+      let found = false;
+      for (const glob of (factor.source_globs || [])) {
+        try {
+          const base = glob.replace(/\*\*\/\*\.\w+$/, '').replace(/\/$/, '');
+          const checkPath = path.join(root, base);
+          if (fs.existsSync(checkPath) && fs.readdirSync(checkPath).length > 0) {
+            found = true; break;
+          }
+        } catch {}
+      }
+      if (!found) {
+        console.log(`[ai-native] ⚠ ${factor.name}: no source files matched (source_globs: ${(factor.source_globs || []).join(', ')})`);
+      }
+    }
+  }
+
   const synced = [];
 
   for (const factor of factors) {
@@ -192,20 +212,51 @@ function installSkill(root) {
 }
 
 function showFactorSummary(memoryDir, lang) {
-  const t = (k) => require('../core/i18n').t(k, lang || 'zh');
   const zh = (lang || 'zh') === 'zh';
 
   console.log(`\n${zh ? '━━━ AI 现在知道这些约束 ━━━' : '━━━ AI now knows ━━━'}`);
   const files = fs.readdirSync(memoryDir).filter(f => f.endsWith('.md') && f !== 'SYNC-STATE.md');
+
+  let emptyCount = 0, thinCount = 0;
+  const allItems = [];
+
   files.forEach(f => {
     const content = fs.readFileSync(path.join(memoryDir, f), 'utf-8');
     const items = content.split('\n').filter(l => l.startsWith('- '));
-    if (items.length > 0) {
-      console.log(`\n${zh ? '✓' : '✓'} ${f.replace('.md', '')} (${items.length} ${zh ? '条' : 'items'})`);
-      items.slice(0, 3).forEach(l => console.log(`  • ${l.replace('- ', '')}`));
-      if (items.length > 3) console.log(`  ${zh ? '…' : '…'} ${zh ? `还有 ${items.length - 3} 条` : `+${items.length - 3} more`}`);
+    const name = f.replace('.md', '');
+
+    if (items.length === 0) {
+      console.log(`\n  ⚠ ${name}: ${zh ? '空' : 'EMPTY'} — ${zh ? '源文档可能不存在' : 'source docs may be missing'}`);
+      emptyCount++;
+    } else if (items.length === 1 && items[0].includes('蒸馏引擎将在完整实现中')) {
+      console.log(`\n  ⚠ ${name}: ${zh ? '占位符' : 'PLACEHOLDER'} — ${zh ? '源文档为空，仅有内置规则' : 'only built-in rules'}`);
+      thinCount++;
+    } else {
+      const icon = items.length >= 5 ? '✓' : (items.length >= 3 ? '○' : '△');
+      console.log(`\n  ${icon} ${name} (${items.length} ${zh ? '条' : 'items'})`);
+      items.slice(0, 3).forEach(l => console.log(`    • ${l.replace('- ', '')}`));
+      if (items.length > 3) console.log(`    ${zh ? '…' : '…'} +${items.length - 3}`);
+      allItems.push(...items);
     }
   });
+
+  // Quality checks
+  if (emptyCount > 0) {
+    console.log(`\n  ⚠ ${emptyCount} ${zh ? '个因子为空。请确认 source_globs 配置正确，项目文档存在。' : 'factors empty. Check source_globs and project docs.'}`);
+  }
+  if (thinCount > 0) {
+    console.log(`  💡 ${zh ? '提示：运行 /ai-native sync 让 AI 从项目文档中真正蒸馏约束。' : 'Tip: run /ai-native sync in chat for real AI distillation.'}`);
+  }
+
+  // Duplicate check
+  if (allItems.length > 10) {
+    const seen = new Set();
+    const dupes = allItems.filter(l => seen.has(l) || !seen.add(l));
+    if (dupes.length > 0) {
+      console.log(`\n  ⚠ ${dupes.length} ${zh ? '条约束在多个因子中重复' : 'items duplicated across factors'}`);
+    }
+  }
+
   console.log(`\n→ ${zh ? '下个 AI 会话自动生效。ai-native show <因子> 查看详情' : 'Effective next session. ai-native show <factor> for details'}\n`);
 }
 

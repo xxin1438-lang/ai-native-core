@@ -134,4 +134,4 @@ function parseSimpleYaml(content) {
   return result;
 }
 
-module.exports = { getProjectRoot, loadConfig, loadManifest };
+module.exports = { getProjectRoot, loadConfig, loadManifest, parseSimpleToml, parseSimpleYaml };

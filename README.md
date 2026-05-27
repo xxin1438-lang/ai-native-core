@@ -47,7 +47,7 @@ ai-native hooks install    # hooks
 ai-native accept           # 验收
 ```
 
-**技术栈**：`react-spa` `nextjs` `vue` `backend-java` `backend-go` `backend-python`
+**技术栈**：`react-spa` `nextjs` `vue` `backend-java` `backend-node` `backend-go` `backend-python`
 
 **角色入口**：[各角色手册](./docs/role-quickstart.md)
 
