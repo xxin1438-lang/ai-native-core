@@ -1,61 +1,61 @@
-# Java 后端（Spring Boot）— 架构不变性规则
+# Java Backend (Spring Boot) — Architecture Immutability Rules
 
-以下规则由适配器内置，定义了 Spring Boot 项目的基础架构边界。
+Built-in adapter rules. Always included in forbidden-patterns during sync.
 
 ---
 
-## 分层架构
+## Layering
 
-- 禁止 Controller 层直接操作数据库（必须通过 Service → Repository）
-- 禁止 Service 层之间循环依赖（必须通过接口 + 事件解耦）
-- 禁止跨层调用（Controller → Repository 跳过 Service）
-- 禁止在 Entity/Domain 对象中引入 Web 层依赖
-- 禁止在 Mapper/Repository 层编写业务逻辑
+- DO NOT access database directly from Controller (must go through Service → Repository)
+- DO NOT create circular dependencies between Service classes (use interfaces + events)
+- DO NOT skip layers (Controller → Repository bypassing Service)
+- DO NOT introduce Web layer dependencies in Entity/Domain objects
+- DO NOT put business logic in Mapper/Repository layer
 
-## 事务管理
+## Transaction Management
 
-- 禁止在 Controller 层使用 @Transactional
-- 禁止在 private 方法上使用 @Transactional（AOP 不生效）
-- 禁止在同一个 Service 类中自调用 @Transactional 方法
-- 禁止在只读查询中使用默认事务传播级别（必须 readOnly = true）
-- 禁止忽略 @Transactional 的 rollbackFor（必须显式声明 rollbackFor = Exception.class）
+- DO NOT use @Transactional on Controller layer
+- DO NOT use @Transactional on private methods (AOP won't work)
+- DO NOT call @Transactional methods within the same Service class
+- DO NOT use default propagation for read-only queries (must set readOnly = true)
+- DO NOT omit rollbackFor in @Transactional (must declare rollbackFor = Exception.class)
 
-## 异常处理
+## Exception Handling
 
-- 禁止在 Service 层 catch 异常后不处理也不重新抛出
-- 禁止在 Controller 层使用 try-catch 返回不同结构响应体（必须用 @ControllerAdvice）
-- 禁止将数据库异常直接暴露给前端
+- DO NOT catch exceptions in Service layer without handling or rethrowing
+- DO NOT return inconsistent response structures from Controller try-catch (use @ControllerAdvice)
+- DO NOT expose database exceptions directly to the frontend
 
-## API 契约
+## API Contract
 
-- 禁止修改已发布 API 的请求/响应字段名或类型（breaking change 必须走 /api/v2/）
-- 禁止在响应体中直接返回 Entity 对象（必须通过 DTO/VO 转换）
-- 禁止使用 Map<String, Object> 作为 API 响应体
-- 禁止在 GET 请求中使用 @RequestBody
+- DO NOT rename or retype published API request/response fields (breaking changes → /api/v2/)
+- DO NOT return Entity objects directly in responses (must convert via DTO/VO)
+- DO NOT use Map<String, Object> as API response body
+- DO NOT use @RequestBody on GET requests
 
-## 安全
+## Security
 
-- 禁止在代码或配置文件中硬编码密钥、token、密码
-- 禁止在 Controller 中手动解析 JWT（必须使用 Spring Security filter chain）
-- 禁止绕过 SecurityContext 直接获取用户信息
-- 禁止在日志中输出完整 JWT token、密码或身份证号
+- DO NOT hardcode keys, tokens, or passwords in code or config files
+- DO NOT manually parse JWT in Controller (use Spring Security filter chain)
+- DO NOT bypass SecurityContext to get user info
+- DO NOT log complete JWT tokens, passwords, or PII
 
-## 数据库操作
+## Database
 
-- 禁止在循环中执行数据库查询（N+1 问题）
-- 禁止在 JPA Entity 中使用 FetchType.EAGER（@OneToMany/@ManyToMany）
-- 禁止在 MyBatis XML mapper 中拼接动态 SQL 而不使用 `<where>` / `<if>` 防注入
-- 禁止生产环境使用 ddl-auto: create / create-drop
-- 禁止 migration 脚本中使用 DROP TABLE / DROP COLUMN 不经审批
-- 禁止使用 SELECT *
+- DO NOT execute database queries inside loops (N+1 problem)
+- DO NOT use FetchType.EAGER on @OneToMany/@ManyToMany JPA entities
+- DO NOT concatenate dynamic SQL in MyBatis XML mappers without `<where>` / `<if>`
+- DO NOT use ddl-auto: create / create-drop in production
+- DO NOT use DROP TABLE / DROP COLUMN in migration scripts without approval
+- DO NOT use SELECT *
 
-## 依赖注入
+## Dependency Injection
 
-- 禁止在 @Service/@Component 类中使用 new 创建依赖对象
-- 禁止使用字段注入（@Autowired on field），必须使用构造器注入
-- 禁止在非 Spring 管理的类中使用 @Autowired
+- DO NOT use `new` to create dependency objects in @Service/@Component classes
+- DO NOT use field injection (@Autowired on field), use constructor injection
+- DO NOT use @Autowired in non-Spring-managed classes
 
-## 测试
+## Testing
 
-- 禁止单元测试启动完整 Spring 上下文（必须用 @WebMvcTest / @DataJpaTest）
-- 禁止测试之间共享可变状态
+- DO NOT start full Spring context in unit tests (use @WebMvcTest / @DataJpaTest)
+- DO NOT share mutable state between tests
