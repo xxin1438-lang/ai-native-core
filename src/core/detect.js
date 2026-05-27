@@ -59,6 +59,10 @@ function detect(root) {
     if (deps.next) { result.stacks.push('nextjs'); result.framework = 'Next.js'; }
     else if (deps.vue) { result.stacks.push('vue'); result.framework = 'Vue'; }
     else if (deps.react) { result.stacks.push('react-spa'); result.framework = 'React'; }
+    // Node.js backend frameworks
+    else if (deps.express || deps.koa || deps.nest || deps.fastify) {
+      result.stacks.push('backend-node'); result.framework = 'Express/Koa';
+    }
 
     result.build = 'npm/pnpm';
     return result;
@@ -78,6 +82,10 @@ function parseChat(input) {
   } else if (lower.includes('go') || lower.includes('golang')) {
     result.stacks.push('backend-go');
     result.type = 'backend';
+  } else if (lower.includes('node') || lower.includes('express') || lower.includes('koa') || lower.includes('nestjs')) {
+    result.stacks.push('backend-node');
+    result.type = 'backend';
+    if (lower.includes('npm')) result.pm = 'npm';
   } else if (lower.includes('python') || lower.includes('fastapi') || lower.includes('django') || lower.includes('flask')) {
     result.stacks.push('backend-python');
     result.type = 'backend';

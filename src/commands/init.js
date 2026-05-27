@@ -10,7 +10,7 @@ function getProjectRoot() {
   catch { return process.cwd(); }
 }
 
-const VALID_STACKS = ['react-spa', 'nextjs', 'vue', 'backend-go', 'backend-python', 'backend-java'];
+const VALID_STACKS = ['react-spa', 'nextjs', 'vue', 'backend-go', 'backend-python', 'backend-java', 'backend-node'];
 
 function run(args) {
   const idx = args.indexOf('--stack');
@@ -153,7 +153,7 @@ function doInit(stacks, isForce, answers = {}) {
 function inferFromStacks(stacks) {
   const answers = { pm: 'pnpm' };
   const frontendStacks = ['react-spa', 'nextjs', 'vue'];
-  const backendStacks = ['backend-java', 'backend-go', 'backend-python'];
+  const backendStacks = ['backend-java', 'backend-go', 'backend-python', 'backend-node'];
   const hasFrontend = stacks.some(s => frontendStacks.includes(s));
   const hasBackend = stacks.some(s => backendStacks.includes(s));
 
@@ -164,7 +164,7 @@ function inferFromStacks(stacks) {
   if (hasBackend) {
     const lang = stacks.find(s => s.startsWith('backend-')).replace('backend-', '');
     answers.test = { java: 'junit', go: 'go-test', python: 'pytest' }[lang] || 'junit';
-    answers.pm = { java: 'maven', go: 'go mod', python: 'pip' }[lang] || 'maven';
+    answers.pm = { java: 'maven', go: 'go mod', python: 'pip', node: 'npm' }[lang] || 'npm';
   } else {
     answers.test = 'vitest';
     answers.pm = 'pnpm';

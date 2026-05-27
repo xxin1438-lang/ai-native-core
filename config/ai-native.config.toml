@@ -17,7 +17,7 @@ description = ""
 # =============================================================================
 [stack]
 # Adapter ID. Single: adapter = "react-spa". Multi: adapter = ["react-spa", "backend-java"]
-# Options: react-spa | nextjs | vue | backend-go | backend-python | backend-java
+# Options: react-spa | nextjs | vue | backend-go | backend-python | backend-java | backend-node
 adapter = "react-spa"
 
 # Package manager: pnpm | npm | yarn | bun | maven | gradle | pip

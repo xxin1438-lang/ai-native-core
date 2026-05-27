@@ -1,0 +1,13 @@
+# backend-node acceptance overrides
+
+phase_overrides:
+  code-quality:
+    lint:
+      run: "eslint ."
+    typecheck:
+      run: "tsc --noEmit"
+    test:
+      run: "npm test"
+  build:
+    build:
+      run: "npm run build"

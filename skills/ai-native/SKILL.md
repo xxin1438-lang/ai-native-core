@@ -12,7 +12,7 @@ Execute all operations directly in chat.
 ## /ai-native init
 
 1. Get project root via `git rev-parse --show-toplevel`
-2. Scan pom.xml/package.json/go.mod for language and version
+2. Scan pom.xml/package.json/go.mod/pyproject.toml for language and version
 3. Confirm with user
 4. Create directories, generate config.toml, copy templates
 
