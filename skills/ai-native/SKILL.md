@@ -18,10 +18,15 @@ Execute all operations directly in chat.
 
 ## /ai-native sync
 
-1. Read MANIFEST.yaml
-2. Load adapter immutable-rules
-3. Write memory factors to .ai-native/memory/
-4. Generate AI tool configs (.claude/, .cursor/, .deepseek/)
+For each factor in MANIFEST.yaml:
+
+1. Read its `source_globs` — collect matching files from project
+2. Read its `builtin_sources` — load adapter immutable-rules
+3. Read its `distill_prompt` — use as instructions
+4. **Distill**: analyze source files per `distill_prompt`, extract ≤`max_items` constraint items
+5. **Merge**: built-in rules (keep all, highest priority) + distilled constraints (supplement)
+6. **Write** to `.ai-native/memory/{output_file}` with YAML frontmatter
+7. After all factors done: write `SYNC-STATE.md`, generate AI tool configs, show summary
 
 ## /ai-native accept
 
